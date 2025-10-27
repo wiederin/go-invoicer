@@ -69,7 +69,33 @@ func (s *UsageService) IncrementUsage(userID int) error {
         periodStart := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
         periodEnd := periodStart.AddDate(0, 1, 0).Add(-time.Second)
 
-        _, err := s.db.Exec(`
+        tx, err := s.db.Begin()
+        if err != nil {
+                return fmt.Errorf("failed to begin transaction: %w", err)
+        }
+        defer tx.Rollback()
+
+        var currentUsage int
+        var monthlyQuota int
+
+        err = tx.QueryRow(`
+                SELECT COALESCE(ur.invoices_generated, 0), p.monthly_quota
+                FROM users u
+                JOIN plans p ON u.plan_id = p.id
+                LEFT JOIN usage_records ur ON ur.user_id = u.id AND ur.period_start = $2
+                WHERE u.id = $1
+                FOR UPDATE
+        `, userID, periodStart).Scan(&currentUsage, &monthlyQuota)
+
+        if err != nil {
+                return fmt.Errorf("failed to get current usage: %w", err)
+        }
+
+        if monthlyQuota != -1 && currentUsage >= monthlyQuota {
+                return fmt.Errorf("quota exceeded")
+        }
+
+        _, err = tx.Exec(`
                 INSERT INTO usage_records (user_id, period_start, period_end, invoices_generated)
                 VALUES ($1, $2, $3, 1)
                 ON CONFLICT (user_id, period_start)
@@ -80,6 +106,10 @@ func (s *UsageService) IncrementUsage(userID int) error {
 
         if err != nil {
                 return fmt.Errorf("failed to increment usage: %w", err)
+        }
+
+        if err := tx.Commit(); err != nil {
+                return fmt.Errorf("failed to commit transaction: %w", err)
         }
 
         return nil

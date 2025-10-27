@@ -1,123 +1,101 @@
-# Invoice Generator Application
-
-## Project Overview
-A subscription-based invoice PDF generator built with Go. Users can create professional PDF invoices through a web interface, with usage limits based on their subscription tier.
+# Invoice Generator Project
 
 ## Project Structure
 
-### Library (`/` root directory)
-The core invoice generation library (`go-invoicer`) - a reusable Go module for creating PDF invoices.
+This project is organized into two separate components:
 
-**Key Files:**
-- `generator.go` - Main invoice document initialization
-- `build.go` - PDF document builder
-- `components/` - Invoice components (address, items, tax, etc.)
-- `constants/` - Configuration constants
+### 1. Public Library: `go-invoicer`
+- **Location**: Root directory (components/, constants/, build.go, generator.go, etc.)
+- **Purpose**: Reusable Go library for generating PDF invoices
+- **Visibility**: Public repository
+- **Module**: `github.com/wiederin/go-invoicer`
 
-### Web Application (`/app` directory)
-Full-stack web application that uses the library.
+### 2. Private Web Application: `app/`
+- **Location**: `app/` directory
+- **Purpose**: Subscription-based SaaS application with user accounts and usage limits
+- **Visibility**: Should be in a separate private repository
+- **Module**: `github.com/wiederin/go-invoicer-app`
 
-**Structure:**
-```
-app/
-├── cmd/server/           # Main server entry point
-├── internal/
-│   ├── models/          # Data models (User, Plan, Invoice, etc.)
-│   ├── database/        # Database connection and migrations
-│   ├── services/        # Business logic (User, Usage, Invoice services)
-│   ├── handlers/        # HTTP API handlers
-│   └── middleware/      # Authentication middleware
-├── static/              # Frontend files (HTML, CSS, JS)
-└── migrations/          # Database schema migrations
+## Architecture
+
+The web application uses the public library as a dependency. The `app/go.mod` references the library using a local replace directive for development:
+
+```go
+replace github.com/wiederin/go-invoicer => ../
 ```
 
-## Features
+## Separating Into Two Repositories
 
-### Subscription Plans
-- **Free**: 20 invoices/month ($0)
-- **Basic**: 100 invoices/month ($9.99)
-- **Pro**: 500 invoices/month ($29.99)
-- **Business**: Unlimited invoices ($99.99)
+To deploy this architecture:
 
-### Current Capabilities
-1. **User Authentication**: Replit Auth integration (auto-creates user accounts)
-2. **Usage Tracking**: Monthly quota enforcement per plan
-3. **Invoice Generation**: Professional PDF invoices with company and customer details
-4. **Invoice History**: View all generated invoices
-5. **Quota Management**: Real-time usage tracking and limits
+1. **Public Library Repository** (this repo)
+   - Keep: All library code in the root
+   - Remove: The `app/` directory
+   - Publish to GitHub as a public repository
+
+2. **Private Web App Repository** (new repo)
+   - Move: The entire `app/` directory to a new repository
+   - Update `app/go.mod` to reference the public library:
+     ```go
+     require github.com/wiederin/go-invoicer v1.0.0
+     ```
+   - Remove the `replace` directive once the library is published
 
 ## Database Schema
 
-**Tables:**
-- `plans` - Subscription plans and pricing
-- `users` - User accounts with Replit Auth integration
-- `subscriptions` - User subscription details
-- `usage_records` - Monthly usage tracking
-- `invoices` - Invoice metadata and history
+The web application uses PostgreSQL with the following tables:
+- **plans**: Subscription tiers (Free: 20/month, Basic: 100/month, Pro: 500/month, Business: unlimited)
+- **users**: User accounts with plan assignments
+- **subscriptions**: Stripe subscription tracking
+- **usage_records**: Monthly usage tracking per user
+- **invoices**: Generated invoice history
+
+## Features
+
+### Library (Public)
+- PDF invoice generation
+- Configurable company and customer details
+- Line items with quantities and prices
+- Custom headers, footers, and notes
+- Multi-currency support
+
+### Web App (Private)
+- Replit authentication integration
+- Usage-based subscription plans
+- Monthly quota enforcement
+- Invoice history tracking
+- RESTful API
+- Modern web UI
+
+## Subscription Plans
+
+| Plan | Monthly Quota | Price |
+|------|--------------|-------|
+| Free | 20 invoices | $0 |
+| Basic | 100 invoices | $9.99 |
+| Pro | 500 invoices | $29.99 |
+| Business | Unlimited | $99.99 |
 
 ## API Endpoints
 
-All API endpoints require authentication via Replit Auth headers.
-
-- `GET /api/user` - Get current user and usage stats
-- `GET /api/usage` - Get current month usage
-- `GET /api/plans` - List all subscription plans
+- `GET /api/user` - Get user info and usage stats
+- `GET /api/usage` - Get current month's usage
+- `GET /api/plans` - List available subscription plans
 - `GET /api/invoices` - Get invoice history
-- `POST /api/invoices/generate` - Generate new PDF invoice (enforces quotas)
-
-## How It Works
-
-1. **Authentication**: Users are authenticated via Replit Auth headers (`X-Replit-User-Id`, `X-Replit-User-Email`)
-2. **User Creation**: First-time users are automatically created with the Free plan
-3. **Invoice Generation**:
-   - Check if user is within monthly quota
-   - Generate PDF using go-invoicer library
-   - Save invoice metadata to database
-   - Increment usage counter
-   - Return PDF to user
-4. **Quota Enforcement**: Returns 402 Payment Required if quota exceeded
-
-## Running the Application
-
-The server runs on port 5000:
-```bash
-cd app && go run ./cmd/server
-```
-
-## Environment Variables
-- `DATABASE_URL` - PostgreSQL connection string (automatically provided by Replit)
-- Other `PG*` variables for database connection
-
-## Future Enhancements (Not Implemented)
-
-### Stripe Integration
-For payment processing and subscription management:
-- User can upgrade/downgrade plans
-- Webhook handling for subscription events
-- Customer portal for billing management
-
-### Additional Features to Consider
-- Invoice templates and customization
-- Logo upload for company branding
-- PDF storage and download links
-- Email delivery of invoices
-- Multi-currency support
-- Tax calculations
-- Recurring invoice templates
+- `POST /api/invoices/generate` - Generate new invoice (checks quota)
 
 ## Development Notes
 
-- The library and web app are separate Go modules
-- The app uses a `replace` directive in `go.mod` to use the local library
-- Database migrations are in SQL format
-- Frontend is vanilla JavaScript (no framework)
-- Authentication uses Replit's built-in auth system
+- The web app runs on port 5000
+- Database migrations are handled in `app/migrations/`
+- Static files are served from `app/static/`
+- Uses Gorilla Mux for routing
+- Uses Gorilla Sessions for session management
 
-## Recent Changes
-- Initial project setup with library extraction
-- Database schema created with subscription and usage tracking
-- REST API implemented with quota enforcement
-- Web UI created for invoice generation
-- Free tier with 20 invoices/month enabled
+## Future Enhancements
 
-Last Updated: October 27, 2025
+- Stripe integration for payment processing
+- PDF storage in object storage
+- Email delivery of invoices
+- Invoice templates
+- Multi-user team accounts

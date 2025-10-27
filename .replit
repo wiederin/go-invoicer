@@ -34,9 +34,9 @@ localPort = 5000
 externalPort = 80
 
 [[ports]]
-localPort = 36865
+localPort = 40473
 externalPort = 3000
 
 [deployment]
 deploymentTarget = "autoscale"
-run = ["bash", "-c", "cd app && go run ./cmd/server"]
+run = ["sh", "-c", "cd app && go run ./cmd/server"]

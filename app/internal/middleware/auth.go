@@ -2,7 +2,11 @@ package middleware
 
 import (
         "context"
+        "crypto/rand"
+        "encoding/base64"
+        "log"
         "net/http"
+        "os"
 
         "github.com/gorilla/sessions"
 )
@@ -12,7 +16,28 @@ type contextKey string
 const UserIDKey contextKey = "userID"
 const UserEmailKey contextKey = "userEmail"
 
-var store = sessions.NewCookieStore([]byte("your-secret-key-change-in-production"))
+var store *sessions.CookieStore
+
+func init() {
+        secret := os.Getenv("SESSION_SECRET")
+        if secret == "" {
+                secret = generateRandomSecret()
+                log.Printf("WARNING: SESSION_SECRET not set, using generated secret. Set SESSION_SECRET environment variable for production.")
+        }
+        if len(secret) < 32 {
+                log.Fatal("SESSION_SECRET must be at least 32 characters long")
+        }
+        store = sessions.NewCookieStore([]byte(secret))
+}
+
+func generateRandomSecret() string {
+        b := make([]byte, 32)
+        _, err := rand.Read(b)
+        if err != nil {
+                log.Fatal("Failed to generate session secret:", err)
+        }
+        return base64.StdEncoding.EncodeToString(b)
+}
 
 type ReplitUserInfo struct {
         ID       string   `json:"id"`

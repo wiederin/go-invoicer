@@ -59,21 +59,6 @@ func (h *Handler) HandleGenerateInvoice(w http.ResponseWriter, r *http.Request) 
                 return
         }
 
-        canGenerate, err := h.usageService.CanGenerateInvoice(user.ID)
-        if err != nil {
-                http.Error(w, "Failed to check quota", http.StatusInternalServerError)
-                return
-        }
-
-        if !canGenerate {
-                w.Header().Set("Content-Type", "application/json")
-                w.WriteHeader(http.StatusPaymentRequired)
-                json.NewEncoder(w).Encode(map[string]string{
-                        "error": "Monthly quota exceeded. Please upgrade your plan.",
-                })
-                return
-        }
-
         var req services.InvoiceRequest
         if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
                 http.Error(w, "Invalid request", http.StatusBadRequest)
@@ -87,6 +72,14 @@ func (h *Handler) HandleGenerateInvoice(w http.ResponseWriter, r *http.Request) 
         }
 
         if err := h.usageService.IncrementUsage(user.ID); err != nil {
+                if err.Error() == "quota exceeded" {
+                        w.Header().Set("Content-Type", "application/json")
+                        w.WriteHeader(http.StatusPaymentRequired)
+                        json.NewEncoder(w).Encode(map[string]string{
+                                "error": "Monthly quota exceeded. Please upgrade your plan.",
+                        })
+                        return
+                }
                 http.Error(w, "Failed to update usage", http.StatusInternalServerError)
                 return
         }
