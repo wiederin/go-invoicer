@@ -27,7 +27,7 @@ func main() {
         r := mux.NewRouter()
 
         r.HandleFunc("/", serveHome).Methods("GET")
-        r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("app/static"))))
+        r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
         api := r.PathPrefix("/api").Subrouter()
         api.Use(middleware.AuthMiddleware)
@@ -44,5 +44,5 @@ func main() {
 }
 
 func serveHome(w http.ResponseWriter, r *http.Request) {
-        http.ServeFile(w, r, "app/static/index.html")
+        http.ServeFile(w, r, "static/index.html")
 }
