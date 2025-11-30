@@ -201,18 +201,6 @@ go-invoicer/
 └── generator_test.go # Tests
 ```
 
-## Use Cases
-
-- Invoice generation for freelancers and small businesses
-- Automated billing systems
-- Accounting software integration
-- SaaS applications requiring invoice functionality
-- E-commerce platforms
-
-## Related Project
-
-For a complete subscription-based SaaS application with user accounts, usage limits, and payment processing built on top of this library, see the private web application repository (link available to authorized users).
-
 ## License
 
 This project is open source and available under the MIT License.
