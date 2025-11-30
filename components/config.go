@@ -26,11 +26,20 @@ type Config struct {
     TextRefTitle         string `default:"Ref." json:"text_ref_title,omitempty"`
 	  TextDateTitle        string `default:"Date" json:"text_date_title,omitempty"`
     TextVersionTitle     string `default:"Version" json:"text_version_title,omitempty"`
-
+    TextTotalTotal      string `default:"SUBTOTAL" json:"text_total_total,omitempty"`
+    TextTotalDiscounted string `default:"TOTAL DISCOUNTED" json:"text_total_discounted,omitempty"`
+    TextTotalTax        string `default:"VAT applied" json:"text_total_tax,omitempty"`
+    TextTotalWithTax    string `default:"TOTAL WITH TAX" json:"text_total_with_tax,omitempty"`
+    TextTotalWithCommission    string `default:"TOTAL" json:"text_total_commission,omitempty"`
+    TextFixedTransferFees    string `default:"Fixed Transfer Fees" json:"text_fixed_transfer_fees,omitempty"`
+    TextPaymentTermTitle string `default:"Payment term" json:"text_payment_term_title,omitempty"`
     TextItemsNameTitle     string `default:"Name" json:"text_items_name_title,omitempty"`
     TextItemsUnitCostTitle string `default:"Ad Spend" json:"text_items_unit_cost_title,omitempty"`
     TextItemsCommissionTitle string `default:"Commission" json:"text_items_commission_title,omitempty"`
     TextItemsTotalTTCTitle string `default:"Total" json:"text_items_total_ttc_title,omitempty"`
+
+    // fees et
+    FixedFee bool `json:"fixed_fee,omitempty"`
 
     UnicodeTranslateFunc UnicodeTranslateFunc
 }

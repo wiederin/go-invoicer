@@ -34,3 +34,8 @@ func (d *Document) AppendItem(item *Item) *Document {
 	d.Items = append(d.Items, item)
 	return d
 }
+
+func (d *Document) SetNotes(notes string) *Document {
+	d.Notes = notes
+	return d
+}

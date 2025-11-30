@@ -68,6 +68,7 @@ func TestInit(t *testing.T) {
     })
 
     doc.SetDescription("Dear Sir or Madam, We hereby invoice you for the following services:")
+    doc.SetNotes("Terms of payment: Full payment is due upon receipt of this invoice. Late payments may incur additional charges or interest as per applicable laws. Please transfer the invoice amount to the account given below, stating the invoice number. With kind regards, MALU Agency")
 
     doc.AppendItem(&components.Item{
       Name: "Item 1 - ",

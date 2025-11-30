@@ -15,6 +15,8 @@ type Document struct {
     Ref          string        `json:"ref,omitempty" validate:"required,min=1,max=32"`
     Version      string        `json:"version,omitempty" validate:"max=32"`
     Description  string        `json:"description,omitempty" validate:"max=1024"`
+    Notes        string        `json:"notes,omitempty"`
+    PaymentTerm  string        `json:"payment_term,omitempty"`
 
     // components
     Config       *Config        `json:"config,omitempty"`
@@ -24,6 +26,7 @@ type Document struct {
     Customer     *Contact      `json:"customer,omitempty" validate:"required"`
     Items        []*Item       `json:"items,omitempty"`
     DefaultTax   *Tax          `json:"default_tax,omitempty"`
+    Discount     *Discount     `json:"discount,omitempty"`
 }
 
 // SetUnicodeTranslator to use

@@ -25,7 +25,7 @@ func (doc *Document) AddItems() {
   	doc.drawsTableTitles()
 
   	doc.Pdf.SetX(10)
-  	doc.Pdf.SetY(doc.Pdf.GetY() + 8)
+  	doc.Pdf.SetY(doc.Pdf.GetY() + 8) // was 8
   	doc.Pdf.SetFont(doc.Config.Font, "", 8)
 
   	for i := 0; i < len(doc.Items); i++ {
@@ -466,7 +466,7 @@ func (i *Item) appendColTo(config *Config, doc *Document) {
 func (doc *Document) drawsTableTitles() {
 	// Draw table titles
 	doc.Pdf.SetX(10)
-	doc.Pdf.SetY(doc.Pdf.GetY() + 5)
+	doc.Pdf.SetY(doc.Pdf.GetY() + 20)// was 5
 	doc.Pdf.SetFont(doc.Config.BoldFont, "B", 8)
 
 	// Draw rec

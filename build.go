@@ -43,8 +43,21 @@ func Build(doc *components.Document) (*fpdf.Fpdf, error) {
   	} else {
   		doc.Pdf.SetXY(10, companyContactBottom)
   	}
-    
+
     doc.AddItems()
+
+    // Check page height (total bloc height = 30, 45 when doc discount)
+    offset := doc.Pdf.GetY() + 30
+    if doc.Discount != nil {
+      offset += 15
+    }
+    if offset > constants.MaxPageHeight {
+      doc.Pdf.AddPage()
+    }
+
+    doc.AddNotes()
+    doc.AddTotal()
+    doc.AddPaymentTerm()
 
     return doc.Pdf, nil
 }
