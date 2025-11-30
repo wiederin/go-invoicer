@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice {{ .Invoice.Number }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 12px;
+            color: #333;
+            line-height: 1.4;
+        }
+        .invoice {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #3b82f6;
+            padding-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 32px;
+            color: #3b82f6;
+            text-transform: uppercase;
+        }
+        .invoice-details {
+            text-align: right;
+        }
+        .invoice-details p {
+            margin: 3px 0;
+        }
+        .parties {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+        }
+        .party {
+            width: 45%;
+        }
+        .party-label {
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            font-size: 10px;
+        }
+        .party-name {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        .party-address {
+            color: #555;
+        }
+        .items {
+            margin-bottom: 30px;
+        }
+        .items table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .items th {
+            background: #f3f4f6;
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: bold;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        .items th.right {
+            text-align: right;
+        }
+        .items th.center {
+            text-align: center;
+        }
+        .items td {
+            padding: 12px 8px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .items td.right {
+            text-align: right;
+        }
+        .items td.center {
+            text-align: center;
+        }
+        .totals {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 40px;
+        }
+        .totals-table {
+            width: 300px;
+        }
+        .totals-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .totals-row.total {
+            font-weight: bold;
+            font-size: 16px;
+            border-bottom: none;
+            border-top: 2px solid #333;
+            padding-top: 12px;
+        }
+        .notes {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .notes-label {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .footer {
+            text-align: center;
+            color: #666;
+            font-size: 10px;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice">
+        <div class="header">
+            <h1>Invoice</h1>
+            <div class="invoice-details">
+                <p><strong>Invoice #:</strong> {{ .Invoice.Number }}</p>
+                <p><strong>Issue Date:</strong> {{ formatDateLong .Invoice.IssueDate }}</p>
+                <p><strong>Due Date:</strong> {{ formatDateLong .Invoice.DueDate }}</p>
+            </div>
+        </div>
+
+        <div class="parties">
+            <div class="party">
+                <div class="party-label">From</div>
+                <div class="party-name">{{ .Invoice.Supplier.Name }}</div>
+                <div class="party-address">
+                    {{ range .Invoice.Supplier.Address.Lines }}
+                    {{ . }}<br>
+                    {{ end }}
+                    {{ if .Invoice.Supplier.VATID }}
+                    VAT ID: {{ .Invoice.Supplier.VATID }}
+                    {{ end }}
+                </div>
+            </div>
+            <div class="party">
+                <div class="party-label">To</div>
+                <div class="party-name">{{ .Invoice.Customer.Name }}</div>
+                <div class="party-address">
+                    {{ range .Invoice.Customer.Address.Lines }}
+                    {{ . }}<br>
+                    {{ end }}
+                    {{ if .Invoice.Customer.VATID }}
+                    VAT ID: {{ .Invoice.Customer.VATID }}
+                    {{ end }}
+                </div>
+            </div>
+        </div>
+
+        <div class="items">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th class="center">Qty</th>
+                        <th class="right">Unit Price</th>
+                        <th class="center">Tax</th>
+                        <th class="right">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{ range .Invoice.LineItems }}
+                    <tr>
+                        <td>{{ .Description }}</td>
+                        <td class="center">{{ .Quantity }}</td>
+                        <td class="right">{{ formatMoney .UnitPrice.Amount $.Invoice.Currency }}</td>
+                        <td class="center">{{ .TaxRate }}%</td>
+                        <td class="right">{{ formatMoney .GrossAmount.Amount $.Invoice.Currency }}</td>
+                    </tr>
+                    {{ end }}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="totals">
+            <div class="totals-table">
+                <div class="totals-row">
+                    <span>Subtotal</span>
+                    <span>{{ formatMoney .SubTotal.Amount .Invoice.Currency }}</span>
+                </div>
+                {{ if not .TotalDiscount.IsZero }}
+                <div class="totals-row">
+                    <span>Discount</span>
+                    <span>-{{ formatMoney .TotalDiscount.Amount .Invoice.Currency }}</span>
+                </div>
+                {{ end }}
+                <div class="totals-row">
+                    <span>Tax</span>
+                    <span>{{ formatMoney .TotalTax.Amount .Invoice.Currency }}</span>
+                </div>
+                <div class="totals-row total">
+                    <span>Total</span>
+                    <span>{{ formatMoney .TotalGross.Amount .Invoice.Currency }}</span>
+                </div>
+            </div>
+        </div>
+
+        {{ if .Invoice.Notes }}
+        <div class="notes">
+            <div class="notes-label">Notes</div>
+            <p>{{ .Invoice.Notes }}</p>
+        </div>
+        {{ end }}
+
+        {{ if .Invoice.Terms }}
+        <div class="notes">
+            <div class="notes-label">Payment Terms</div>
+            <p>{{ .Invoice.Terms }}</p>
+        </div>
+        {{ end }}
+
+        <div class="footer">
+            <p>Thank you for your business!</p>
+        </div>
+    </div>
+</body>
+</html>

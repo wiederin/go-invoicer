@@ -1,20 +1,19 @@
 # go-invoicer
 
-A professional invoice PDF generator library written in Go.
+A professional invoice PDF generator library for Go.
 
-## Overview
-
-`go-invoicer` is a lightweight, easy-to-use Go library for generating professional PDF invoices. It uses [gofpdf](https://github.com/go-pdf/fpdf) under the hood to create beautifully formatted invoices with customizable headers, footers, company details, line items, and payment terms.
+[![Go Reference](https://pkg.go.dev/badge/github.com/wiederin/go-invoicer.svg)](https://pkg.go.dev/github.com/wiederin/go-invoicer)
+[![Go Report Card](https://goreportcard.com/badge/github.com/wiederin/go-invoicer)](https://goreportcard.com/report/github.com/wiederin/go-invoicer)
 
 ## Features
 
-- 📄 Generate professional PDF invoices
-- 🎨 Customizable headers and footers
-- 💼 Company and customer details
-- 📊 Line items with quantities, unit costs, and descriptions
-- 💰 Multi-currency support
-- 📝 Custom notes and payment terms
-- 🔢 Automatic total calculations
+- **Type-safe invoice creation** with fluent builder API
+- **Automatic calculations** for subtotals, taxes, discounts, and totals
+- **Multi-currency support** with proper formatting (USD, EUR, CHF, GBP, etc.)
+- **Tax helpers** with common rates for Switzerland, EU, UK, and more
+- **Template engine** with Go templates and embedded template support
+- **PDF rendering** with customizable layouts
+- **Validation** with clear error messages
 
 ## Installation
 
@@ -28,187 +27,229 @@ go get github.com/wiederin/go-invoicer
 package main
 
 import (
-    "github.com/wiederin/go-invoicer"
-    "github.com/wiederin/go-invoicer/components"
-    "github.com/wiederin/go-invoicer/constants"
+    "os"
+    "time"
+
+    "github.com/wiederin/go-invoicer/invoice"
+    "github.com/wiederin/go-invoicer/render"
 )
 
 func main() {
-    // Initialize invoice document
-    doc, err := invoicer.Init(&components.Config{
-        TextInvoiceType:   constants.Invoice,
-        TextRefTitle:      "Invoice No.",
-        CurrencySymbol:    "$",
-        CurrencyPrecision: 2,
-        CurrencyDecimal:   ".",
-        CurrencyThousand:  ",",
-    })
+    // Build an invoice
+    inv, err := invoice.New().
+        Number("INV-2025-001").
+        IssueDate(time.Now()).
+        DueDate(time.Now().AddDate(0, 0, 30)).
+        Currency("USD").
+        Supplier(invoice.Party{
+            Name: "Your Company",
+            Address: invoice.Address{
+                Street: "123 Business St",
+                City: "New York",
+                PostalCode: "10001",
+                Country: "USA",
+            },
+        }).
+        Customer(invoice.Party{
+            Name: "Customer Inc",
+            Address: invoice.Address{
+                Street: "456 Client Ave",
+                City: "Los Angeles",
+                PostalCode: "90001",
+                Country: "USA",
+            },
+        }).
+        AddItem(invoice.NewLineItem(
+            "Consulting Services",
+            10, // hours
+            invoice.NewMoney(150, "USD"),
+            8.0, // tax rate %
+        )).
+        Notes("Thank you for your business!").
+        Build()
+
     if err != nil {
         panic(err)
     }
 
-    // Set invoice number
-    doc.SetVersion("INV-2025-001")
-
-    // Set company details
-    doc.SetCompany(&components.Contact{
-        Name: "Acme Corporation",
-        Address: &components.Address{
-            Address:    "123 Business Street",
-            PostalCode: "10001",
-            City:       "New York",
-        },
-    })
-
-    // Set customer details
-    doc.SetCustomer(&components.Contact{
-        Name: "John Smith",
-        Address: &components.Address{
-            Address:    "456 Customer Ave",
-            PostalCode: "90001",
-            City:       "Los Angeles",
-            Country:    "United States",
-        },
-    })
-
-    // Add description
-    doc.SetDescription("Thank you for your business!")
-
-    // Add line items
-    doc.AppendItem(&components.Item{
-        Name:        "Web Design Services",
-        Description: "Custom website design and development",
-        UnitCost:    "1500.00",
-        Quantity:    "1",
-    })
-
-    // Add payment notes
-    doc.SetNotes("Payment is due within 30 days.")
-
-    // Build the PDF
-    pdf, err := invoicer.Build(doc)
-    if err != nil {
-        panic(err)
-    }
-
-    // Save to file
-    err = pdf.OutputFileAndClose("invoice.pdf")
-    if err != nil {
-        panic(err)
-    }
+    // Render to PDF
+    renderer := render.NewSimpleRenderer()
+    pdf, _ := renderer.RenderInvoice(inv)
+    os.WriteFile("invoice.pdf", pdf, 0644)
 }
 ```
 
-## API Reference
+## Packages
 
-### Initialization
+### `invoice` - Core Domain Models
 
-```go
-doc, err := invoicer.Init(&components.Config{
-    TextInvoiceType:   constants.Invoice,
-    TextRefTitle:      "Invoice No.",
-    CurrencySymbol:    "$",
-    CurrencyPrecision: 2,
-    CurrencyDecimal:   ".",
-    CurrencyThousand:  ",",
-})
-```
-
-### Setting Invoice Details
+Create and validate invoices with automatic totals calculation:
 
 ```go
-// Invoice number
-doc.SetVersion("INV-001")
+// Create invoice with builder
+inv, err := invoice.New().
+    Number("INV-001").
+    IssueDate(time.Now()).
+    DueDate(time.Now().AddDate(0, 0, 30)).
+    Currency("CHF").
+    Supplier(supplier).
+    Customer(customer).
+    AddItem(item1).
+    AddItem(item2).
+    Build()
 
-// Header
-doc.SetHeader(&components.HeaderFooter{
-    Text:       "<center>INVOICE</center>",
-    Pagination: true,
-})
-
-// Footer
-doc.SetFooter(&components.HeaderFooter{
-    Text:       "<center>Thank you for your business</center>",
-    Pagination: true,
-})
-
-// Description
-doc.SetDescription("Description text...")
-
-// Notes
-doc.SetNotes("Payment terms and additional notes...")
+// Access calculated totals
+fmt.Println(inv.SubTotal())      // Net amount before tax
+fmt.Println(inv.TotalTax())      // Total tax amount
+fmt.Println(inv.TotalGross())    // Final amount due
+fmt.Println(inv.TaxBreakdown())  // Tax by rate
 ```
 
-### Company and Customer Information
+### `tax` - Tax Calculations
+
+Common tax rates and calculators:
 
 ```go
-// Company
-doc.SetCompany(&components.Contact{
-    Name: "Company Name",
-    Logo: logoBytes, // optional []byte
-    Address: &components.Address{
-        Address:    "Street Address",
-        PostalCode: "12345",
-        City:       "City",
-    },
-})
+import "github.com/wiederin/go-invoicer/tax"
 
-// Customer
-doc.SetCustomer(&components.Contact{
-    Name: "Customer Name",
-    Address: &components.Address{
-        Address:    "Street Address",
-        PostalCode: "12345",
-        City:       "City",
-        Country:    "Country",
-    },
-})
+// Use predefined rates
+swissVAT, _ := tax.GetRate("CH_STANDARD")  // 8.1%
+germanVAT, _ := tax.GetRate("DE_STANDARD") // 19%
+
+// Calculate tax
+amount := decimal.NewFromFloat(1000)
+taxAmount := swissVAT.Calculate(amount)  // 81.00
+gross := swissVAT.AddToAmount(amount)    // 1081.00
+
+// Custom calculator
+calc := tax.NewCalculator().AddRate(swissVAT)
+totalTax := calc.CalculateTax(amount)
 ```
 
-### Adding Line Items
+### `currency` - Currency Formatting
+
+Format amounts in different currencies:
 
 ```go
-doc.AppendItem(&components.Item{
-    Name:        "Product/Service Name",
-    Description: "Description",
-    UnitCost:    "100.00",
-    Quantity:    "2",
-})
+import "github.com/wiederin/go-invoicer/currency"
+
+formatter, _ := currency.NewFormatter("CHF")
+formatted := formatter.Format(decimal.NewFromFloat(1234.56))
+// Output: CHF 1'234.56
+
+formatter, _ = currency.NewFormatter("EUR")
+formatted = formatter.Format(decimal.NewFromFloat(1234.56))
+// Output: 1.234,56 €
 ```
 
-### Building the PDF
+### `template` - Template Engine
+
+Use Go templates with embedded or file-based templates:
 
 ```go
-pdf, err := invoicer.Build(doc)
+import (
+    "embed"
+    "github.com/wiederin/go-invoicer/template"
+)
 
-// Save to file
-err = pdf.OutputFileAndClose("invoice.pdf")
+//go:embed templates/*
+var templates embed.FS
 
-// Or write to io.Writer
-var buf bytes.Buffer
-err = pdf.Output(&buf)
-pdfBytes := buf.Bytes()
+mgr := template.NewManager(
+    template.NewEmbedSource(templates),
+)
+
+html, err := mgr.RenderHTML("templates/invoice.html", data)
 ```
 
-## Project Structure
+### `render` - PDF Rendering
 
+Generate PDFs with customizable options:
+
+```go
+import "github.com/wiederin/go-invoicer/render"
+
+// Simple renderer (no template needed)
+renderer := render.NewSimpleRenderer()
+pdf, err := renderer.RenderInvoice(inv)
+
+// Template-based renderer
+engine := render.NewEngine(templateManager)
+pdf, err := engine.RenderInvoice(inv, "invoice.html")
+
+// Custom options
+renderer := render.NewSimpleRenderer()
+renderer.Options = render.Options{
+    PageSize:    "A4",
+    Orientation: "P",
+    MarginTop:   15,
+    FontFamily:  "Helvetica",
+}
 ```
-go-invoicer/
-├── components/       # Component types (Contact, Address, Item, etc.)
-├── constants/        # Constants used throughout the library
-├── build.go         # PDF building logic
-├── generator.go     # Invoice initialization
-└── generator_test.go # Tests
+
+## Line Items
+
+Create line items with quantities, prices, and optional discounts:
+
+```go
+// Basic line item
+item := invoice.NewLineItem(
+    "Web Development",  // description
+    10,                 // quantity
+    invoice.NewMoney(100, "USD"),  // unit price
+    8.0,                // tax rate %
+)
+
+// With discount
+item = item.WithDiscount(10)  // 10% discount
+
+// Access calculations
+item.SubTotal()      // qty * unit price
+item.DiscountAmount() // discount amount
+item.NetAmount()     // after discount
+item.TaxAmount()     // tax on net
+item.GrossAmount()   // final amount
 ```
 
-## License
+## Validation
 
-This project is open source and available under the MIT License.
+Invoices are validated on build with clear errors:
+
+```go
+inv, err := invoice.New().Build()
+// err = ErrMissingInvoiceNumber
+
+inv, err := invoice.New().
+    Number("INV-001").
+    IssueDate(time.Now()).
+    DueDate(time.Now().AddDate(0, 0, -1)). // past date
+    Build()
+// err = ErrDueDateBeforeIssue
+```
+
+## Examples
+
+See the [examples](examples/) directory for complete working examples:
+
+- `basic/` - Simple invoice generation
+- `with_template/` - Custom HTML templates
+- `swiss_qr/` - Swiss QR bill (coming soon)
+
+## Roadmap
+
+- [x] Core invoice models with validation
+- [x] Tax and currency helpers
+- [x] Template engine with embedding
+- [x] PDF rendering
+- [ ] Swiss QR bill support
+- [ ] EU e-invoicing formats
+- [ ] Digital signatures
+- [ ] Hosted API service
 
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## Support
+## License
 
-For issues and feature requests, please use the GitHub issue tracker.
+MIT License - see [LICENSE](LICENSE) for details.
