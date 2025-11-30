@@ -2,6 +2,7 @@ package invoice
 
 import "errors"
 
+// Validation errors returned by invoice and line item validation.
 var (
 	ErrMissingInvoiceNumber = errors.New("invoice number is required")
 	ErrMissingIssueDate     = errors.New("issue date is required")

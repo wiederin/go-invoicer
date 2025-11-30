@@ -1,3 +1,5 @@
+// Package template provides a template engine for rendering invoice HTML
+// from Go templates with support for embedded and filesystem templates.
 package template
 
 import (
@@ -10,23 +12,30 @@ import (
 	"strings"
 	"time"
 
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
+
 	"github.com/shopspring/decimal"
 	"github.com/wiederin/go-invoicer/currency"
 )
 
+// Source defines the interface for loading templates from various sources.
 type Source interface {
 	Load(name string) (string, error)
 	List() ([]string, error)
 }
 
+// FSSource loads templates from a filesystem.
 type FSSource struct {
 	fs fs.FS
 }
 
+// NewFSSource creates a new filesystem template source.
 func NewFSSource(filesystem fs.FS) *FSSource {
 	return &FSSource{fs: filesystem}
 }
 
+// Load loads a template by name from the filesystem.
 func (s *FSSource) Load(name string) (string, error) {
 	data, err := fs.ReadFile(s.fs, name)
 	if err != nil {
@@ -35,6 +44,7 @@ func (s *FSSource) Load(name string) (string, error) {
 	return string(data), nil
 }
 
+// List returns all template files in the filesystem.
 func (s *FSSource) List() ([]string, error) {
 	var templates []string
 	err := fs.WalkDir(s.fs, ".", func(path string, d fs.DirEntry, err error) error {
@@ -49,14 +59,17 @@ func (s *FSSource) List() ([]string, error) {
 	return templates, err
 }
 
+// EmbedSource loads templates from embedded files.
 type EmbedSource struct {
 	fs embed.FS
 }
 
+// NewEmbedSource creates a new embedded filesystem template source.
 func NewEmbedSource(filesystem embed.FS) *EmbedSource {
 	return &EmbedSource{fs: filesystem}
 }
 
+// Load loads a template by name from embedded files.
 func (s *EmbedSource) Load(name string) (string, error) {
 	data, err := s.fs.ReadFile(name)
 	if err != nil {
@@ -65,6 +78,7 @@ func (s *EmbedSource) Load(name string) (string, error) {
 	return string(data), nil
 }
 
+// List returns all template files in the embedded filesystem.
 func (s *EmbedSource) List() ([]string, error) {
 	var templates []string
 	err := fs.WalkDir(s.fs, ".", func(path string, d fs.DirEntry, err error) error {
@@ -79,12 +93,14 @@ func (s *EmbedSource) List() ([]string, error) {
 	return templates, err
 }
 
+// Manager manages template loading, caching, and rendering.
 type Manager struct {
 	sources   []Source
 	templates map[string]*template.Template
 	funcMap   template.FuncMap
 }
 
+// NewManager creates a new template manager with the given sources.
 func NewManager(sources ...Source) *Manager {
 	m := &Manager{
 		sources:   sources,
@@ -95,6 +111,7 @@ func NewManager(sources ...Source) *Manager {
 }
 
 func (m *Manager) defaultFuncMap() template.FuncMap {
+	titleCaser := cases.Title(language.English)
 	return template.FuncMap{
 		"formatMoney": func(amount decimal.Decimal, currencyCode string) string {
 			return currency.FormatSimple(amount, currencyCode)
@@ -110,8 +127,10 @@ func (m *Manager) defaultFuncMap() template.FuncMap {
 		},
 		"upper": strings.ToUpper,
 		"lower": strings.ToLower,
-		"title": strings.Title,
-		"join":  strings.Join,
+		"title": func(s string) string {
+			return titleCaser.String(s)
+		},
+		"join": strings.Join,
 		"add": func(a, b int) int {
 			return a + b
 		},
@@ -134,10 +153,12 @@ func (m *Manager) defaultFuncMap() template.FuncMap {
 	}
 }
 
+// AddFunc adds a custom function to the template function map.
 func (m *Manager) AddFunc(name string, fn any) {
 	m.funcMap[name] = fn
 }
 
+// Load loads and parses a template by name.
 func (m *Manager) Load(name string) error {
 	for _, source := range m.sources {
 		content, err := source.Load(name)
@@ -153,6 +174,7 @@ func (m *Manager) Load(name string) error {
 	return fmt.Errorf("template %s not found in any source", name)
 }
 
+// RenderHTML renders a template to HTML string.
 func (m *Manager) RenderHTML(name string, data any) (string, error) {
 	tmpl, ok := m.templates[name]
 	if !ok {
@@ -169,6 +191,7 @@ func (m *Manager) RenderHTML(name string, data any) (string, error) {
 	return buf.String(), nil
 }
 
+// RenderToBytes renders a template to a byte slice.
 func (m *Manager) RenderToBytes(name string, data any) ([]byte, error) {
 	html, err := m.RenderHTML(name, data)
 	if err != nil {
@@ -177,6 +200,7 @@ func (m *Manager) RenderToBytes(name string, data any) ([]byte, error) {
 	return []byte(html), nil
 }
 
+// ListTemplates returns all available template names from all sources.
 func (m *Manager) ListTemplates() []string {
 	var all []string
 	for _, source := range m.sources {

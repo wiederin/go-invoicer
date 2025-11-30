@@ -1,5 +1,6 @@
 package invoice
 
+// Address represents a postal address.
 type Address struct {
 	Street     string `json:"street"`
 	City       string `json:"city"`
@@ -8,10 +9,12 @@ type Address struct {
 	Country    string `json:"country"`
 }
 
+// IsEmpty returns true if the address has no fields set.
 func (a Address) IsEmpty() bool {
 	return a.Street == "" && a.City == "" && a.PostalCode == "" && a.Country == ""
 }
 
+// Lines returns the address as formatted lines for display.
 func (a Address) Lines() []string {
 	var lines []string
 	if a.Street != "" {
@@ -36,6 +39,7 @@ func (a Address) Lines() []string {
 	return lines
 }
 
+// Party represents a business entity (supplier or customer).
 type Party struct {
 	Name    string  `json:"name"`
 	Address Address `json:"address"`
@@ -45,6 +49,7 @@ type Party struct {
 	IBAN    string  `json:"iban,omitempty"`
 }
 
+// Validate checks that the party has all required fields.
 func (p Party) Validate() error {
 	if p.Name == "" {
 		return ErrMissingPartyName
