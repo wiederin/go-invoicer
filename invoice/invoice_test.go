@@ -1,199 +1,83 @@
-package invoice
+package invoice_test
 
 import (
 	"testing"
 	"time"
+
+	"github.com/wiederin/go-invoicer/invoice"
+	"github.com/wiederin/go-invoicer/tax"
 )
 
-func TestInvoiceBuilder(t *testing.T) {
-	inv, err := New().
-		Number("INV-001").
-		IssueDate(time.Now()).
-		DueDate(time.Now().AddDate(0, 0, 30)).
-		Currency("USD").
-		Supplier(Party{Name: "Supplier Co", Address: Address{Street: "123 St", City: "NYC", PostalCode: "10001", Country: "US"}}).
-		Customer(Party{Name: "Customer Inc", Address: Address{Street: "456 Ave", City: "LA", PostalCode: "90001", Country: "US"}}).
-		AddItem(NewLineItem("Service", 1, NewMoney(100, "USD"), 10)).
+func TestInvoiceTotal(t *testing.T) {
+	inv := invoice.New("INV-001")
+	inv.SetSeller(invoice.Party{Name: "Seller"})
+	inv.SetBuyer(invoice.Party{Name: "Buyer"})
+	inv.AddLine(invoice.LineItem{
+		Description: "Item",
+		Quantity:    2,
+		UnitPrice:   invoice.Money{Amount: 1000, Currency: "CHF"},
+		TaxRate:     0.1,
+	})
+
+	if err := inv.Validate(); err != nil {
+		t.Fatal(err)
+	}
+
+	sub := inv.Subtotal()
+	if sub.Amount != 2000 {
+		t.Fatalf("subtotal: got %d want 2000", sub.Amount)
+	}
+
+	total := inv.Total()
+	if total.Amount != 2200 {
+		t.Fatalf("total: got %d want 2200", total.Amount)
+	}
+}
+
+func TestBuilder(t *testing.T) {
+	issued := time.Date(2026, 1, 15, 0, 0, 0, 0, time.UTC)
+	due := issued.AddDate(0, 0, 30)
+
+	inv, err := invoice.NewBuilder().
+		Number("INV-2026-001").
+		IssuedAt(issued).
+		DueAt(due).
+		Seller(invoice.Party{Name: "Acme GmbH", Address: invoice.Address{City: "Zürich", Country: "CH"}}).
+		Buyer(invoice.Party{Name: "Client AG"}).
+		AddLine(invoice.NewLineItem(
+			"Consulting",
+			10,
+			invoice.NewMoney(15000, "CHF"),
+			tax.CHStandard.Fraction,
+		)).
+		Notes("Thank you for your business.").
 		Build()
-
 	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
+		t.Fatal(err)
 	}
-
-	if inv.Number != "INV-001" {
-		t.Errorf("expected number INV-001, got %s", inv.Number)
+	if inv.Total().Amount <= inv.Subtotal().Amount {
+		t.Fatal("expected tax to increase total")
 	}
-
-	if len(inv.LineItems) != 1 {
-		t.Errorf("expected 1 line item, got %d", len(inv.LineItems))
+	if len(inv.TaxBreakdown()) != 1 {
+		t.Fatalf("tax breakdown: got %d lines", len(inv.TaxBreakdown()))
 	}
 }
 
-func TestInvoiceValidation(t *testing.T) {
-	tests := []struct {
-		name    string
-		builder func() *Builder
-		wantErr error
-	}{
-		{
-			name: "missing number",
-			builder: func() *Builder {
-				return New().
-					IssueDate(time.Now()).
-					DueDate(time.Now().AddDate(0, 0, 30)).
-					Currency("USD").
-					Supplier(Party{Name: "S"}).
-					Customer(Party{Name: "C"}).
-					AddItem(NewLineItem("X", 1, NewMoney(100, "USD"), 0))
-			},
-			wantErr: ErrMissingInvoiceNumber,
-		},
-		{
-			name: "missing issue date",
-			builder: func() *Builder {
-				return New().
-					Number("INV-001").
-					DueDate(time.Now().AddDate(0, 0, 30)).
-					Currency("USD").
-					Supplier(Party{Name: "S"}).
-					Customer(Party{Name: "C"}).
-					AddItem(NewLineItem("X", 1, NewMoney(100, "USD"), 0))
-			},
-			wantErr: ErrMissingIssueDate,
-		},
-		{
-			name: "due date before issue",
-			builder: func() *Builder {
-				return New().
-					Number("INV-001").
-					IssueDate(time.Now()).
-					DueDate(time.Now().AddDate(0, 0, -1)).
-					Currency("USD").
-					Supplier(Party{Name: "S"}).
-					Customer(Party{Name: "C"}).
-					AddItem(NewLineItem("X", 1, NewMoney(100, "USD"), 0))
-			},
-			wantErr: ErrDueDateBeforeIssue,
-		},
-		{
-			name: "no line items",
-			builder: func() *Builder {
-				return New().
-					Number("INV-001").
-					IssueDate(time.Now()).
-					DueDate(time.Now().AddDate(0, 0, 30)).
-					Currency("USD").
-					Supplier(Party{Name: "S"}).
-					Customer(Party{Name: "C"})
-			},
-			wantErr: ErrNoLineItems,
-		},
+func TestValidateErrors(t *testing.T) {
+	_, err := invoice.NewBuilder().Build()
+	if err != invoice.ErrMissingNumber {
+		t.Fatalf("got %v want ErrMissingNumber", err)
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			_, err := tt.builder().Build()
-			if err != tt.wantErr {
-				t.Errorf("expected error %v, got %v", tt.wantErr, err)
-			}
-		})
-	}
-}
-
-func TestLineItemCalculations(t *testing.T) {
-	item := NewLineItem("Product", 2, NewMoney(100, "USD"), 10)
-
-	subtotal := item.SubTotal()
-	if subtotal.Float64() != 200 {
-		t.Errorf("expected subtotal 200, got %v", subtotal.Float64())
-	}
-
-	tax := item.TaxAmount()
-	if tax.Float64() != 20 {
-		t.Errorf("expected tax 20, got %v", tax.Float64())
-	}
-
-	gross := item.GrossAmount()
-	if gross.Float64() != 220 {
-		t.Errorf("expected gross 220, got %v", gross.Float64())
-	}
-}
-
-func TestLineItemWithDiscount(t *testing.T) {
-	item := NewLineItem("Product", 1, NewMoney(100, "USD"), 10).WithDiscount(10)
-
-	discount := item.DiscountAmount()
-	if discount.Float64() != 10 {
-		t.Errorf("expected discount 10, got %v", discount.Float64())
-	}
-
-	net := item.NetAmount()
-	if net.Float64() != 90 {
-		t.Errorf("expected net 90, got %v", net.Float64())
-	}
-
-	tax := item.TaxAmount()
-	if tax.Float64() != 9 {
-		t.Errorf("expected tax 9, got %v", tax.Float64())
-	}
-
-	gross := item.GrossAmount()
-	if gross.Float64() != 99 {
-		t.Errorf("expected gross 99, got %v", gross.Float64())
-	}
-}
-
-func TestInvoiceTotals(t *testing.T) {
-	inv, _ := New().
-		Number("INV-001").
-		IssueDate(time.Now()).
-		DueDate(time.Now().AddDate(0, 0, 30)).
-		Currency("USD").
-		Supplier(Party{Name: "S"}).
-		Customer(Party{Name: "C"}).
-		AddItem(NewLineItem("A", 1, NewMoney(100, "USD"), 10)).
-		AddItem(NewLineItem("B", 2, NewMoney(50, "USD"), 10)).
+	_, err = invoice.NewBuilder().
+		Number("X").
+		IssuedAt(time.Now()).
+		DueAt(time.Now().AddDate(0, 0, -1)).
+		Seller(invoice.Party{Name: "S"}).
+		Buyer(invoice.Party{Name: "B"}).
+		AddLine(invoice.NewLineItem("x", 1, invoice.NewMoney(100, "CHF"), 0)).
 		Build()
-
-	subtotal := inv.SubTotal()
-	if subtotal.Float64() != 200 {
-		t.Errorf("expected subtotal 200, got %v", subtotal.Float64())
-	}
-
-	tax := inv.TotalTax()
-	if tax.Float64() != 20 {
-		t.Errorf("expected tax 20, got %v", tax.Float64())
-	}
-
-	gross := inv.TotalGross()
-	if gross.Float64() != 220 {
-		t.Errorf("expected gross 220, got %v", gross.Float64())
-	}
-}
-
-func TestMoneyOperations(t *testing.T) {
-	m1 := NewMoney(100, "USD")
-	m2 := NewMoney(50, "USD")
-
-	sum, err := m1.Add(m2)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if sum.Float64() != 150 {
-		t.Errorf("expected 150, got %v", sum.Float64())
-	}
-
-	diff, err := m1.Sub(m2)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if diff.Float64() != 50 {
-		t.Errorf("expected 50, got %v", diff.Float64())
-	}
-
-	m3 := NewMoney(100, "EUR")
-	_, err = m1.Add(m3)
-	if err == nil {
-		t.Error("expected currency mismatch error")
+	if err != invoice.ErrDueBeforeIssue {
+		t.Fatalf("got %v want ErrDueBeforeIssue", err)
 	}
 }

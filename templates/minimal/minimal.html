@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Invoice {{.Number}}</title>
+  <style>
+    body { font-family: Georgia, serif; max-width: 640px; margin: 48px auto; color: #222; line-height: 1.6; }
+    h1 { font-size: 22px; font-weight: normal; border-bottom: 1px solid #222; padding-bottom: 8px; }
+    .meta { font-size: 13px; color: #555; margin-bottom: 24px; }
+    table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 14px; }
+    td { padding: 6px 0; border-bottom: 1px solid #eee; }
+    td:last-child { text-align: right; }
+    .total { font-weight: bold; border-top: 2px solid #222; }
+  </style>
+</head>
+<body>
+  <h1>Invoice {{.Number}}</h1>
+  <p class="meta">{{.IssuedAt}}{{if .DueAt}} · due {{.DueAt}}{{end}}</p>
+  <p><strong>{{.Seller.Name}}</strong> → {{.Buyer.Name}}</p>
+  <table>
+    {{range .Lines}}
+    <tr><td>{{.Description}} × {{.Quantity}}</td><td>{{.LineTotal}}</td></tr>
+    {{end}}
+    <tr class="total"><td>Total</td><td>{{.Total}}</td></tr>
+  </table>
+  {{if .Notes}}<p>{{.Notes}}</p>{{end}}
+</body>
+</html>

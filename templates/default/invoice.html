@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Invoice {{.Number}}</title>
+  <style>
+    :root {
+      --text: #1a1a1a;
+      --muted: #666;
+      --border: #e5e5e5;
+      --accent: #2563eb;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      color: var(--text);
+      margin: 0;
+      padding: 40px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    h1 { font-size: 28px; margin: 0 0 8px; }
+    .meta { color: var(--muted); margin-bottom: 32px; }
+    .parties {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+    .party h2 {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin: 0 0 8px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 24px;
+    }
+    th, td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      font-size: 12px;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    td.num, th.num { text-align: right; }
+    .totals {
+      margin-left: auto;
+      width: 280px;
+    }
+    .totals tr td:last-child { text-align: right; }
+    .totals .grand td {
+      font-weight: 700;
+      font-size: 16px;
+      border-top: 2px solid var(--text);
+      padding-top: 12px;
+    }
+    .notes {
+      margin-top: 32px;
+      padding: 16px;
+      background: #f8fafc;
+      border-radius: 8px;
+    }
+    .notes h2 { font-size: 14px; margin: 0 0 8px; }
+  </style>
+</head>
+<body>
+  <h1>Invoice {{.Number}}</h1>
+  <div class="meta">
+    Issued: {{.IssuedAt}}
+    {{if .DueAt}} · Due: {{.DueAt}}{{end}}
+  </div>
+
+  <div class="parties">
+    <div class="party">
+      <h2>From</h2>
+      <strong>{{.Seller.Name}}</strong><br>
+      {{if .Seller.Email}}{{.Seller.Email}}<br>{{end}}
+      {{if .Seller.VATID}}VAT {{.Seller.VATID}}<br>{{end}}
+      {{.Seller.Address}}
+    </div>
+    <div class="party">
+      <h2>Bill to</h2>
+      <strong>{{.Buyer.Name}}</strong><br>
+      {{if .Buyer.Email}}{{.Buyer.Email}}<br>{{end}}
+      {{if .Buyer.VATID}}VAT {{.Buyer.VATID}}<br>{{end}}
+      {{.Buyer.Address}}
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Description</th>
+        <th class="num">Qty</th>
+        <th class="num">Unit</th>
+        <th class="num">Tax</th>
+        <th class="num">Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{range .Lines}}
+      <tr>
+        <td>{{.Description}}</td>
+        <td class="num">{{.Quantity}}</td>
+        <td class="num">{{.UnitPrice}}</td>
+        <td class="num">{{.TaxLabel}}</td>
+        <td class="num">{{.LineTotal}}</td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+
+  <table class="totals">
+    <tr><td>Subtotal</td><td>{{.Subtotal}}</td></tr>
+    {{range .TaxLines}}
+    <tr><td>{{.Label}}</td><td>{{.Amount}}</td></tr>
+    {{end}}
+    <tr class="grand"><td>Total due</td><td>{{.Total}}</td></tr>
+  </table>
+
+  {{if .Notes}}
+  <div class="notes">
+    <h2>Notes</h2>
+    <p>{{.Notes}}</p>
+  </div>
+  {{end}}
+</body>
+</html>

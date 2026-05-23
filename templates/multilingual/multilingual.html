@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="{{.Locale}}">
+<head>
+  <meta charset="utf-8">
+  <title>{{.Labels.Invoice}} {{.Number}}</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 40px; color: #1a1a1a; }
+    h1 { font-size: 24px; margin-bottom: 4px; }
+    .meta { color: #666; margin-bottom: 24px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 8px; border-bottom: 1px solid #e5e5e5; text-align: left; }
+    th.num, td.num { text-align: right; }
+    .totals { margin-top: 16px; width: 280px; margin-left: auto; }
+    .totals td:last-child { text-align: right; }
+    .grand td { font-weight: bold; border-top: 2px solid #111; }
+  </style>
+</head>
+<body>
+  <h1>{{.Labels.Invoice}} {{.Number}}</h1>
+  <p class="meta">{{.Labels.Issued}}: {{.IssuedAt}}{{if .DueAt}} · {{.Labels.Due}}: {{.DueAt}}{{end}}</p>
+  <p><strong>{{.Labels.From}}:</strong> {{.Seller.Name}}<br>{{.Seller.Address}}</p>
+  <p><strong>{{.Labels.BillTo}}:</strong> {{.Buyer.Name}}<br>{{.Buyer.Address}}</p>
+  <table>
+    <thead>
+      <tr>
+        <th>{{.Labels.Description}}</th>
+        <th class="num">{{.Labels.Quantity}}</th>
+        <th class="num">{{.Labels.UnitPrice}}</th>
+        <th class="num">{{.Labels.Tax}}</th>
+        <th class="num">{{.Labels.Amount}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{range .Lines}}
+      <tr>
+        <td>{{.Description}}</td>
+        <td class="num">{{.Quantity}}</td>
+        <td class="num">{{.UnitPrice}}</td>
+        <td class="num">{{.TaxLabel}}</td>
+        <td class="num">{{.LineTotal}}</td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+  <table class="totals">
+    <tr><td>{{.Labels.Subtotal}}</td><td>{{.Subtotal}}</td></tr>
+    {{range .TaxLines}}<tr><td>{{.Label}}</td><td>{{.Amount}}</td></tr>{{end}}
+    <tr class="grand"><td>{{.Labels.TotalDue}}</td><td>{{.Total}}</td></tr>
+  </table>
+  {{if .Notes}}<p><strong>{{.Labels.Notes}}:</strong> {{.Notes}}</p>{{end}}
+</body>
+</html>

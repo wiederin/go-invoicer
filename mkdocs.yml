@@ -1,0 +1,30 @@
+site_name: go-invoicer
+site_description: Developer-first invoicing for Go
+site_url: https://github.com/wiederin/go-invoicer
+repo_url: https://github.com/wiederin/go-invoicer
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+  features:
+    - navigation.sections
+    - content.code.copy
+
+nav:
+  - Home: index.md
+  - Getting started: getting-started.md
+  - Templates: templates.md
+  - Examples: examples.md
+  - Changelog: changelog.md
+
+docs_dir: docs
+strict: true
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - toc:
+      permalink: true

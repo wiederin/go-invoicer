@@ -1,9 +1,7 @@
-// Basic example: build an invoice, render HTML, optionally export PDF.
+// Example: Swiss QR-bill invoice (HTML + optional PDF).
 //
-// Usage:
-//
-//	go run ./examples/basic
-//	go run ./examples/basic -pdf   # requires Chrome/Chromium
+//	go run ./examples/swiss_qr
+//	go run ./examples/swiss_qr -pdf
 package main
 
 import (
@@ -21,45 +19,38 @@ import (
 	"github.com/wiederin/go-invoicer/tax"
 )
 
+// Demo IBAN (Swiss test account format — replace in production).
+const demoIBAN = "CH93 0076 2011 6238 5295 7"
+
 func main() {
-	withPDF := flag.Bool("pdf", false, "also render PDF via headless Chromium")
+	withPDF := flag.Bool("pdf", false, "render PDF")
 	outDir := flag.String("out", ".", "output directory")
 	flag.Parse()
 
 	issued := time.Now().UTC()
 	inv, err := invoice.NewBuilder().
-		Number("INV-2026-0001").
+		Number("CH-INV-2026-0042").
 		IssuedAt(issued).
 		DueAt(issued.AddDate(0, 0, 30)).
 		Seller(invoice.Party{
-			Name:  "Survih GmbH",
-			Email: "billing@example.com",
-			VATID: "CHE-123.456.789",
+			Name: "Survih GmbH",
 			Address: invoice.Address{
-				Line1: "Bahnhofstrasse 1", City: "Zürich",
-				PostalCode: "8001", Country: "CH",
+				Line1: "Bahnhofstrasse 1", PostalCode: "8001", City: "Zürich", Country: "CH",
 			},
 		}).
 		Buyer(invoice.Party{
-			Name: "Example Customer AG",
+			Name: "Musterkunde AG",
 			Address: invoice.Address{
-				Line1: "Customerweg 5", City: "Bern",
-				PostalCode: "3000", Country: "CH",
+				Line1: "Marktgasse 3", PostalCode: "3011", City: "Bern", Country: "CH",
 			},
 		}).
 		AddLine(invoice.NewLineItem(
-			"Platform subscription — Pro",
+			"Software-Lizenz Q2",
 			1,
-			invoice.NewMoney(19900, "CHF"),
+			invoice.NewMoney(89000, "CHF"),
 			tax.CHStandard.Fraction,
 		)).
-		AddLine(invoice.NewLineItem(
-			"Onboarding support (hours)",
-			4,
-			invoice.NewMoney(15000, "CHF"),
-			tax.CHStandard.Fraction,
-		)).
-		Notes("Please transfer within 30 days. Thank you!").
+		Notes("Zahlbar via QR-Rechnung.").
 		Build()
 	if err != nil {
 		log.Fatal(err)
@@ -70,7 +61,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	html, err := engine.RenderDefault(inv)
+	html, err := engine.RenderSwiss(inv, demoIBAN)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -78,15 +69,13 @@ func main() {
 	if err := os.MkdirAll(*outDir, 0o755); err != nil {
 		log.Fatal(err)
 	}
-
-	htmlPath := filepath.Join(*outDir, "invoice.html")
+	htmlPath := filepath.Join(*outDir, "invoice-swiss.html")
 	if err := os.WriteFile(htmlPath, []byte(html), 0o644); err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println("Wrote", htmlPath)
 
 	if !*withPDF {
-		fmt.Println("Tip: run with -pdf to generate invoice.pdf (requires Chrome/Chromium)")
 		return
 	}
 
@@ -94,12 +83,11 @@ func main() {
 	defer cancel()
 
 	renderer := pdf.NewChromiumRenderer()
-	pdfBytes, err := pdf.RenderInvoiceDefault(ctx, engine, renderer, inv)
+	pdfBytes, err := renderer.RenderHTML(ctx, html)
 	if err != nil {
-		log.Fatalf("PDF render failed (is Chromium installed?): %v", err)
+		log.Fatal(err)
 	}
-
-	pdfPath := filepath.Join(*outDir, "invoice.pdf")
+	pdfPath := filepath.Join(*outDir, "invoice-swiss.pdf")
 	if err := os.WriteFile(pdfPath, pdfBytes, 0o644); err != nil {
 		log.Fatal(err)
 	}

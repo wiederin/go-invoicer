@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{{.Number}}</title>
+  <style>
+    :root { --accent: #7c3aed; }
+    body { font-family: "Helvetica Neue", sans-serif; padding: 48px; background: #faf5ff; }
+    .card { background: #fff; border-radius: 16px; padding: 40px; box-shadow: 0 4px 24px rgba(124,58,237,.12); }
+    h1 { color: var(--accent); margin: 0; }
+    .brand { font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); }
+    table { width: 100%; margin-top: 24px; }
+    td { padding: 10px 0; border-bottom: 1px solid #eee; }
+    td:last-child { text-align: right; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <p class="brand">Custom template example</p>
+    <h1>Invoice {{.Number}}</h1>
+    <p>{{.Seller.Name}} · {{.IssuedAt}}</p>
+    <p>Prepared for <strong>{{.Buyer.Name}}</strong></p>
+    <table>
+      {{range .Lines}}
+      <tr><td>{{.Description}}</td><td>{{.LineTotal}}</td></tr>
+      {{end}}
+      <tr><td>Total</td><td>{{.Total}}</td></tr>
+    </table>
+  </div>
+</body>
+</html>
