@@ -1,7 +1,6 @@
 // Package stripe maps Stripe invoice data to the go-invoicer domain model.
 //
-// This is an MVP import layer — no HTTP client yet. Use with Stripe webhooks
-// or API responses unmarshalled into StripeInvoice.
+// Use the API client, webhook HTTP handler, or unmarshalled Stripe JSON.
 package stripe
 
 import (

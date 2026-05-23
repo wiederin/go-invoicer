@@ -17,6 +17,8 @@ nav:
   - Home: index.md
   - Getting started: getting-started.md
   - Templates: templates.md
+  - Swiss QR-bill: swiss-qr.md
+  - Stripe: stripe.md
   - Examples: examples.md
   - Changelog: changelog.md
 

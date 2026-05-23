@@ -36,6 +36,11 @@ func (b Bill) Validate() error {
 	if b.Amount < 0 {
 		return fmt.Errorf("swiss qr: amount cannot be negative")
 	}
+	if b.Reference != "" {
+		if err := ValidateQRR(b.Reference); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 

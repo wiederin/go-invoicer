@@ -36,6 +36,25 @@ func TestPayload(t *testing.T) {
 	}
 }
 
+func TestValidate_withQRR(t *testing.T) {
+	p26 := strings.Repeat("0", 26)
+	cd, err := swiss.Mod10RecursiveCheckDigit(p26)
+	if err != nil {
+		t.Fatal(err)
+	}
+	b := swiss.Bill{
+		IBAN: "CH9300762011623852957", Currency: "CHF", Amount: 100,
+		Reference: p26 + string(cd),
+		Creditor: invoice.Party{
+			Name: "A",
+			Address: invoice.Address{Line1: "x", PostalCode: "1", City: "z", Country: "CH"},
+		},
+	}
+	if err := b.Validate(); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestQRDataURL(t *testing.T) {
 	b := swiss.Bill{
 		IBAN: "CH9300762011623852957", Currency: "CHF", Amount: 1000,

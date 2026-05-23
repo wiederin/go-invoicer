@@ -4,6 +4,16 @@
 
 ### Added
 
+- Swiss QRR reference validation (`qr/swiss.ValidateQRR`, mod10 recursive)
+- Stripe webhook HTTP handler tests
+- Platform `GET /v1/templates`; render handler delegates to worker
+- Dashboard: Swiss template, IBAN field, PDF preview
+- Docs: `swiss-qr.md`, `stripe.md`
+
+## [0.2.0] - 2026-05-23
+
+### Added
+
 - Localization (`render/i18n`) — English, German, French
 - Multilingual invoice template
 - Stripe API client (`FetchInvoice`, `SyncInvoice`)
