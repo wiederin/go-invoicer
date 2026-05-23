@@ -4,7 +4,7 @@
 
 Developer-first invoicing library for Go — strongly typed, HTML templates, Chromium PDF export.
 
-> Mirrored from the private [GitLab monorepo](https://gitlab.com/survih/go-invoicer) (`oss/`). Issues and PRs: [GitHub](https://github.com/wiederin/go-invoicer).
+Contributions welcome via [GitHub Issues and pull requests](https://github.com/wiederin/go-invoicer).
 
 ## Features
 
