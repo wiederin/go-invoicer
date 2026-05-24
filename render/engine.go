@@ -31,7 +31,8 @@ func NewEngine(fsys fs.FS, patterns ...string) (*Engine, error) {
 // DefaultEngine uses all embedded templates.
 func DefaultEngine() (*Engine, error) {
 	return NewEngine(templates.FS,
-		"default/*.html", "minimal/*.html", "swiss-qr/*.html", "multilingual/*.html")
+		"default/*.html", "minimal/*.html", "swiss-qr/*.html", "multilingual/*.html",
+		"modern/*.html", "studio/*.html")
 }
 
 // RenderOptions configures a render call.
@@ -64,6 +65,16 @@ func (e *Engine) RenderMultilingual(inv *invoice.Invoice, locale i18n.Locale) (s
 // RenderMinimal renders the minimal template.
 func (e *Engine) RenderMinimal(inv *invoice.Invoice) (string, error) {
 	return e.RenderInvoice(inv, templates.MinimalInvoice)
+}
+
+// RenderModern renders the modern SaaS-style template.
+func (e *Engine) RenderModern(inv *invoice.Invoice) (string, error) {
+	return e.RenderInvoice(inv, templates.ModernInvoice)
+}
+
+// RenderStudio renders the editorial studio template.
+func (e *Engine) RenderStudio(inv *invoice.Invoice) (string, error) {
+	return e.RenderInvoice(inv, templates.StudioInvoice)
 }
 
 // RenderInvoice renders an invoice with the named template (e.g. "default/invoice.html").

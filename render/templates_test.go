@@ -40,6 +40,38 @@ func TestRenderMinimal(t *testing.T) {
 	}
 }
 
+func TestRenderModern(t *testing.T) {
+	engine, err := render.DefaultEngine()
+	if err != nil {
+		t.Fatal(err)
+	}
+	html, err := engine.RenderModern(sampleInvoice(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{"INV-TPL-1", "invoice-badge", "Total due"} {
+		if !strings.Contains(html, want) {
+			t.Fatalf("missing %q", want)
+		}
+	}
+}
+
+func TestRenderStudio(t *testing.T) {
+	engine, err := render.DefaultEngine()
+	if err != nil {
+		t.Fatal(err)
+	}
+	html, err := engine.RenderStudio(sampleInvoice(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{"INV-TPL-1", "class=\"hero\"", "Total due"} {
+		if !strings.Contains(html, want) {
+			t.Fatalf("missing %q", want)
+		}
+	}
+}
+
 func TestRenderMultilingualDE(t *testing.T) {
 	engine, err := render.DefaultEngine()
 	if err != nil {

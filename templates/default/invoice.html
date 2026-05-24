@@ -6,34 +6,46 @@
   <title>Invoice {{.Number}}</title>
   <style>
     :root {
-      --text: #1a1a1a;
-      --muted: #666;
-      --border: #e5e5e5;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #e5e7eb;
       --accent: #2563eb;
+      --soft: #f9fafb;
     }
     * { box-sizing: border-box; }
     body {
       font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
       color: var(--text);
       margin: 0;
-      padding: 40px;
+      padding: 40px 44px;
       font-size: 14px;
-      line-height: 1.5;
+      line-height: 1.55;
     }
-    h1 { font-size: 28px; margin: 0 0 8px; }
-    .meta { color: var(--muted); margin-bottom: 32px; }
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 24px;
+      margin-bottom: 36px;
+      padding-bottom: 24px;
+      border-bottom: 2px solid var(--text);
+    }
+    h1 { font-size: 30px; margin: 0; letter-spacing: -0.02em; font-weight: 700; }
+    .meta { color: var(--muted); text-align: right; font-size: 13px; line-height: 1.7; }
+    .meta strong { display: block; color: var(--text); font-size: 15px; }
     .parties {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 24px;
+      gap: 28px;
       margin-bottom: 32px;
     }
     .party h2 {
-      font-size: 12px;
+      font-size: 11px;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.08em;
       color: var(--muted);
-      margin: 0 0 8px;
+      margin: 0 0 10px;
+      font-weight: 700;
     }
     table {
       width: 100%;
@@ -41,42 +53,49 @@
       margin-bottom: 24px;
     }
     th, td {
-      padding: 10px 12px;
+      padding: 11px 12px;
       text-align: left;
       border-bottom: 1px solid var(--border);
     }
     th {
-      font-size: 12px;
+      font-size: 11px;
       text-transform: uppercase;
+      letter-spacing: 0.05em;
       color: var(--muted);
-      font-weight: 600;
+      font-weight: 700;
+      background: var(--soft);
     }
-    td.num, th.num { text-align: right; }
+    td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
     .totals {
       margin-left: auto;
-      width: 280px;
+      width: 300px;
     }
-    .totals tr td:last-child { text-align: right; }
+    .totals tr td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
     .totals .grand td {
       font-weight: 700;
-      font-size: 16px;
+      font-size: 17px;
       border-top: 2px solid var(--text);
       padding-top: 12px;
     }
     .notes {
       margin-top: 32px;
-      padding: 16px;
-      background: #f8fafc;
-      border-radius: 8px;
+      padding: 16px 18px;
+      background: var(--soft);
+      border-radius: 10px;
+      border-left: 4px solid var(--accent);
     }
-    .notes h2 { font-size: 14px; margin: 0 0 8px; }
+    .notes h2 { font-size: 13px; margin: 0 0 8px; font-weight: 700; }
+    .notes p { margin: 0; color: var(--muted); }
   </style>
 </head>
 <body>
-  <h1>Invoice {{.Number}}</h1>
-  <div class="meta">
-    Issued: {{.IssuedAt}}
-    {{if .DueAt}} · Due: {{.DueAt}}{{end}}
+  <div class="top">
+    <h1>Invoice</h1>
+    <div class="meta">
+      <strong>{{.Number}}</strong>
+      Issued {{.IssuedAt}}
+      {{if .DueAt}}<br>Due {{.DueAt}}{{end}}
+    </div>
   </div>
 
   <div class="parties">

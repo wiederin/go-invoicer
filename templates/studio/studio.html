@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Invoice {{.Number}}</title>
+  <style>
+    :root {
+      --ink: #18181b;
+      --muted: #71717a;
+      --line: #e4e4e7;
+      --paper: #fafafa;
+      --header: #18181b;
+      --gold: #ca8a04;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--ink);
+      background: #fff;
+    }
+    .hero {
+      background: var(--header);
+      color: #fafafa;
+      padding: 36px 48px 32px;
+    }
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 24px;
+    }
+    .hero h1 {
+      margin: 0;
+      font-size: 32px;
+      font-weight: 400;
+      letter-spacing: -0.02em;
+    }
+    .hero .meta {
+      text-align: right;
+      font-family: system-ui, sans-serif;
+      font-size: 12px;
+      color: #a1a1aa;
+      line-height: 1.7;
+    }
+    .hero .meta strong {
+      display: block;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .hero .rule {
+      height: 2px;
+      background: var(--gold);
+      width: 64px;
+      margin-top: 20px;
+    }
+    .body {
+      padding: 40px 48px 48px;
+      background: var(--paper);
+    }
+    .parties {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-bottom: 36px;
+      font-family: system-ui, sans-serif;
+      font-size: 13px;
+    }
+    .parties h2 {
+      margin: 0 0 8px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .parties .name { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+    table.lines {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 28px;
+      font-family: system-ui, sans-serif;
+      font-size: 13px;
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+    table.lines th {
+      text-align: left;
+      padding: 12px 16px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-bottom: 2px solid var(--ink);
+      background: #fff;
+    }
+    table.lines td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    table.lines tr:last-child td { border-bottom: none; }
+    .num { text-align: right; font-variant-numeric: tabular-nums; }
+    .summary {
+      display: flex;
+      justify-content: flex-end;
+    }
+    .summary-box {
+      width: 300px;
+      background: #fff;
+      border: 1px solid var(--line);
+      padding: 20px 24px;
+      font-family: system-ui, sans-serif;
+    }
+    .summary-box table { width: 100%; border-collapse: collapse; }
+    .summary-box td { padding: 6px 0; }
+    .summary-box td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+    .summary-box tr.total td {
+      padding-top: 14px;
+      border-top: 2px solid var(--ink);
+      font-size: 20px;
+      font-weight: 700;
+      font-family: Georgia, serif;
+    }
+    .notes {
+      margin-top: 36px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+      font-family: system-ui, sans-serif;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .notes h2 {
+      margin: 0 0 8px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+    .notes p { margin: 0; }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-top">
+      <div>
+        <h1>Invoice</h1>
+        <div class="rule"></div>
+      </div>
+      <div class="meta">
+        <strong>{{.Number}}</strong>
+        Issued {{.IssuedAt}}
+        {{if .DueAt}}<br>Due {{.DueAt}}{{end}}
+      </div>
+    </div>
+  </header>
+
+  <div class="body">
+    <div class="parties">
+      <div>
+        <h2>From</h2>
+        <div class="name">{{.Seller.Name}}</div>
+        {{if .Seller.Email}}{{.Seller.Email}}<br>{{end}}
+        {{if .Seller.VATID}}VAT {{.Seller.VATID}}<br>{{end}}
+        {{.Seller.Address}}
+      </div>
+      <div>
+        <h2>Bill to</h2>
+        <div class="name">{{.Buyer.Name}}</div>
+        {{if .Buyer.Email}}{{.Buyer.Email}}<br>{{end}}
+        {{if .Buyer.VATID}}VAT {{.Buyer.VATID}}<br>{{end}}
+        {{.Buyer.Address}}
+      </div>
+    </div>
+
+    <table class="lines">
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th class="num">Qty</th>
+          <th class="num">Unit</th>
+          <th class="num">Tax</th>
+          <th class="num">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .Lines}}
+        <tr>
+          <td>{{.Description}}</td>
+          <td class="num">{{.Quantity}}</td>
+          <td class="num">{{.UnitPrice}}</td>
+          <td class="num">{{.TaxLabel}}</td>
+          <td class="num">{{.LineTotal}}</td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+
+    <div class="summary">
+      <div class="summary-box">
+        <table>
+          <tr><td>Subtotal</td><td>{{.Subtotal}}</td></tr>
+          {{range .TaxLines}}
+          <tr><td>{{.Label}}</td><td>{{.Amount}}</td></tr>
+          {{end}}
+          <tr class="total"><td>Total due</td><td>{{.Total}}</td></tr>
+        </table>
+      </div>
+    </div>
+
+    {{if .Notes}}
+    <div class="notes">
+      <h2>Notes</h2>
+      <p>{{.Notes}}</p>
+    </div>
+    {{end}}
+  </div>
+</body>
+</html>

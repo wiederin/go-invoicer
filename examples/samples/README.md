@@ -5,6 +5,8 @@ Pre-generated examples of every built-in template (same invoice data, different 
 | File | Template |
 |------|----------|
 | [invoice-default.pdf](invoice-default.pdf) | Default |
+| [invoice-modern.pdf](invoice-modern.pdf) | Modern |
+| [invoice-studio.pdf](invoice-studio.pdf) | Studio |
 | [invoice-minimal.pdf](invoice-minimal.pdf) | Minimal |
 | [invoice-multilingual-en.pdf](invoice-multilingual-en.pdf) | Multilingual (English) |
 | [invoice-multilingual-de.pdf](invoice-multilingual-de.pdf) | Multilingual (German) |

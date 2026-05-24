@@ -46,6 +46,8 @@ func main() {
 		fn   func() (string, error)
 	}{
 		{"invoice-default.pdf", func() (string, error) { return engine.RenderDefault(inv) }},
+		{"invoice-modern.pdf", func() (string, error) { return engine.RenderModern(inv) }},
+		{"invoice-studio.pdf", func() (string, error) { return engine.RenderStudio(inv) }},
 		{"invoice-minimal.pdf", func() (string, error) { return engine.RenderMinimal(inv) }},
 		{"invoice-multilingual-en.pdf", func() (string, error) {
 			return engine.RenderMultilingual(inv, i18n.LocaleEN)

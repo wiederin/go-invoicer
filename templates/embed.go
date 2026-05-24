@@ -5,7 +5,7 @@ import "embed"
 
 // FS contains all embedded HTML templates.
 //
-//go:embed default/*.html minimal/*.html swiss-qr/*.html multilingual/*.html
+//go:embed default/*.html minimal/*.html swiss-qr/*.html multilingual/*.html modern/*.html studio/*.html
 var FS embed.FS
 
 // Template file names (ParseFS uses the file basename as template name).
@@ -14,4 +14,6 @@ const (
 	MinimalInvoice       = "minimal.html"
 	SwissInvoice         = "swiss.html"
 	MultilingualInvoice = "multilingual.html"
+	ModernInvoice       = "modern.html"
+	StudioInvoice       = "studio.html"
 )
