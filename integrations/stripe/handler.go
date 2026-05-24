@@ -58,6 +58,10 @@ func WebhookHandler(opts HandlerOptions) http.HandlerFunc {
 			return
 		}
 		inv := apiInv.ToDomainInvoice().ToDomain(ImportOptions{Supplier: opts.Supplier})
+		if inv.Metadata == nil {
+			inv.Metadata = map[string]string{}
+		}
+		inv.Metadata["stripe_invoice_id"] = apiInv.ID
 		if err := inv.Validate(); err != nil {
 			http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 			return

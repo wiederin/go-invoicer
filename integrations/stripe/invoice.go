@@ -10,6 +10,9 @@ import (
 	"github.com/wiederin/go-invoicer/invoice"
 )
 
+// StripeInvoiceIDMeta is the metadata key linking a domain invoice to Stripe.
+const StripeInvoiceIDMeta = "stripe_invoice_id"
+
 // Invoice is a subset of Stripe invoice fields needed for PDF rendering.
 type Invoice struct {
 	ID           string
