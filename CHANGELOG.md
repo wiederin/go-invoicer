@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-05-24
+
 ### Added
 
 - **Modern** and **Studio** invoice HTML templates + sample PDFs
@@ -10,16 +12,6 @@
 - Platform `GET /v1/templates`; render handler delegates to worker
 - Dashboard: Swiss template, IBAN field, PDF preview, invoice CRUD + async PDF jobs
 - Docs: `swiss-qr.md`, `stripe.md`
-
-### Fixed
-
-- `pdf.ChromiumRenderer` discovers `chromium` / `CHROMIUM_PATH` (not only `google-chrome`)
-- Platform API Docker image bundles Chromium for async PDF jobs on ECS
-
-## [0.2.0] - 2026-05-23
-
-### Added
-
 - Localization (`render/i18n`) — English, German, French
 - Multilingual invoice template
 - Stripe API client (`FetchInvoice`, `SyncInvoice`)
@@ -27,6 +19,10 @@
 - `examples/stripe_sync`
 - Platform API MVP (`POST /v1/render/html`, `/v1/render/pdf`, `/v1/webhooks/stripe`)
 - Renderer HTTP mode (`renderer -listen :8081`)
+
+### Fixed
+
+- `pdf.ChromiumRenderer` discovers `chromium` / `CHROMIUM_PATH` (not only `google-chrome`)
 
 ## [0.1.0] - 2026-05-23
 
@@ -41,4 +37,5 @@
 - Examples: `basic`, `with_template`, `swiss_qr`
 - MkDocs documentation scaffold
 
+[0.2.0]: https://github.com/wiederin/go-invoicer/releases/tag/v0.2.0
 [0.1.0]: https://github.com/wiederin/go-invoicer/releases/tag/v0.1.0
