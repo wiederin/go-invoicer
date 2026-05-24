@@ -55,6 +55,8 @@ go run ./examples/basic
 go run ./examples/basic -pdf -out ./out
 ```
 
+Example PDFs for all templates: [`examples/samples/`](examples/samples/) (or `go run ./examples/samples`).
+
 ## Packages
 
 | Package | Description |
