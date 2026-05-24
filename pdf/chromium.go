@@ -3,6 +3,8 @@ package pdf
 import (
 	"context"
 	"fmt"
+	"os"
+	"os/exec"
 	"time"
 
 	"github.com/chromedp/cdproto/page"
@@ -23,6 +25,22 @@ func WithChromiumTimeout(d time.Duration) ChromiumOption {
 	return func(r *ChromiumRenderer) { r.timeout = d }
 }
 
+// chromiumExecPath returns a Chrome/Chromium binary (chromedp defaults to google-chrome).
+func chromiumExecPath() string {
+	if p := os.Getenv("CHROMIUM_PATH"); p != "" {
+		return p
+	}
+	if p := os.Getenv("CHROME_PATH"); p != "" {
+		return p
+	}
+	for _, name := range []string{"chromium", "chromium-browser", "google-chrome", "google-chrome-stable"} {
+		if p, err := exec.LookPath(name); err == nil {
+			return p
+		}
+	}
+	return ""
+}
+
 // NewChromiumRenderer creates a renderer using a local Chromium/Chrome binary.
 func NewChromiumRenderer(opts ...ChromiumOption) *ChromiumRenderer {
 	allocOpts := append(chromedp.DefaultExecAllocatorOptions[:],
@@ -31,6 +49,9 @@ func NewChromiumRenderer(opts ...ChromiumOption) *ChromiumRenderer {
 		chromedp.Flag("no-sandbox", true),
 		chromedp.Flag("disable-dev-shm-usage", true),
 	)
+	if path := chromiumExecPath(); path != "" {
+		allocOpts = append(allocOpts, chromedp.ExecPath(path))
+	}
 	r := &ChromiumRenderer{
 		opts:    allocOpts,
 		timeout: 30 * time.Second,
