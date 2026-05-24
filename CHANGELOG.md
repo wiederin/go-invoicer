@@ -4,11 +4,17 @@
 
 ### Added
 
+- **Modern** and **Studio** invoice HTML templates + sample PDFs
 - Swiss QRR reference validation (`qr/swiss.ValidateQRR`, mod10 recursive)
 - Stripe webhook HTTP handler tests
 - Platform `GET /v1/templates`; render handler delegates to worker
-- Dashboard: Swiss template, IBAN field, PDF preview
+- Dashboard: Swiss template, IBAN field, PDF preview, invoice CRUD + async PDF jobs
 - Docs: `swiss-qr.md`, `stripe.md`
+
+### Fixed
+
+- `pdf.ChromiumRenderer` discovers `chromium` / `CHROMIUM_PATH` (not only `google-chrome`)
+- Platform API Docker image bundles Chromium for async PDF jobs on ECS
 
 ## [0.2.0] - 2026-05-23
 
