@@ -6,6 +6,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root { --sky: #38a8ff; --mist: #daeeff; --cloud: #f0f7ff; --void: #07111f; --muted: #4a7a9b; --line: rgba(56,168,255,.22); }
+    {{template "branding-accent-css" .}}
     * { box-sizing: border-box; }
     body { margin: 0; padding: 36px 40px; font-family: "Outfit", system-ui, sans-serif; font-size: 13px; color: var(--void); background: var(--mist); }
     .sheet { max-width: 780px; margin: 0 auto; background: var(--cloud); border: 1px solid var(--line); border-radius: 14px; padding: 36px 40px; display: flex; flex-direction: column; }
@@ -48,8 +49,8 @@
     {{if (.Layout.Show "line_items")}}
     <div class="gi-block" data-block-id="line_items" style="order: {{.Layout.Ord "line_items"}}">
     <table class="items">
-      <thead><tr><th>Description</th><th class="num">Qty</th><th class="num">Unit</th><th class="num">Tax</th><th class="num">Amount</th></tr></thead>
-      <tbody>{{range .Lines}}<tr><td>{{.Description}}</td><td class="num">{{.Quantity}}</td><td class="num">{{.UnitPrice}}</td><td class="num">{{.TaxLabel}}</td><td class="num">{{.LineTotal}}</td></tr>{{end}}</tbody>
+      <thead><tr>{{template "line-head-en" .}}</tr></thead>
+      <tbody>{{range .Lines}}<tr><td>{{.Description}}</td>{{if or (not $.Branding) $.Branding.ShowQuantity}}<td class="num">{{.Quantity}}</td>{{end}}{{if or (not $.Branding) $.Branding.ShowUnitPrice}}<td class="num">{{.UnitPrice}}</td>{{end}}{{if or (not $.Branding) $.Branding.ShowTax}}<td class="num">{{.TaxLabel}}</td>{{end}}{{if or (not $.Branding) $.Branding.ShowLineTotal}}<td class="num">{{.LineTotal}}</td>{{end}}</tr>{{end}}</tbody>
     </table>
     </div>
     {{end}}

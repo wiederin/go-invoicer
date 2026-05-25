@@ -31,6 +31,7 @@ func NewEngine(fsys fs.FS, patterns ...string) (*Engine, error) {
 // DefaultEngine uses all embedded templates.
 func DefaultEngine() (*Engine, error) {
 	return NewEngine(templates.FS,
+		"partials/*.html",
 		"default/*.html", "minimal/*.html", "swiss-qr/*.html", "multilingual/*.html",
 		"modern/*.html", "studio/*.html",
 		"stratosphere/*.html", "ocean/*.html", "ledger/*.html", "mist/*.html")

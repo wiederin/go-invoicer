@@ -178,3 +178,27 @@ func (c *Client) PushInvoice(ctx context.Context, inv *domain.Invoice, opts Expo
 	inv.Metadata[StripeInvoiceIDMeta] = stInv.ID
 	return stInv.ID, nil
 }
+
+// FinalizeInvoice marks a draft Stripe invoice as open (ready to send/collect payment).
+func (c *Client) FinalizeInvoice(ctx context.Context, stripeInvoiceID string) error {
+	if err := c.withKey(); err != nil {
+		return err
+	}
+	_, err := stripeinvoice.FinalizeInvoice(stripeInvoiceID, nil)
+	if err != nil {
+		return fmt.Errorf("stripe: finalize invoice: %w", err)
+	}
+	return nil
+}
+
+// SendInvoice emails the finalized Stripe invoice to the customer.
+func (c *Client) SendInvoice(ctx context.Context, stripeInvoiceID string) error {
+	if err := c.withKey(); err != nil {
+		return err
+	}
+	_, err := stripeinvoice.SendInvoice(stripeInvoiceID, nil)
+	if err != nil {
+		return fmt.Errorf("stripe: send invoice: %w", err)
+	}
+	return nil
+}

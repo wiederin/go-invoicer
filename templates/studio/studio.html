@@ -13,6 +13,7 @@
       --header: #18181b;
       --gold: #ca8a04;
     }
+    {{template "branding-accent-css" .}}
     * { box-sizing: border-box; }
     body {
       margin: 0;
@@ -157,6 +158,7 @@
   <header class="hero gi-block" data-block-id="header" style="order: {{.Layout.Ord "header"}}">
     <div class="hero-top">
       <div>
+        {{template "branding-logo" .}}
         <h1>Invoice</h1>
         <div class="rule"></div>
       </div>
@@ -193,22 +195,16 @@
     <div class="gi-block" data-block-id="line_items" style="order: {{.Layout.Ord "line_items"}}">
     <table class="lines">
       <thead>
-        <tr>
-          <th>Description</th>
-          <th class="num">Qty</th>
-          <th class="num">Unit</th>
-          <th class="num">Tax</th>
-          <th class="num">Amount</th>
-        </tr>
+        <tr>{{template "line-head-en" .}}</tr>
       </thead>
       <tbody>
         {{range .Lines}}
         <tr>
           <td>{{.Description}}</td>
-          <td class="num">{{.Quantity}}</td>
-          <td class="num">{{.UnitPrice}}</td>
-          <td class="num">{{.TaxLabel}}</td>
-          <td class="num">{{.LineTotal}}</td>
+          {{if or (not $.Branding) $.Branding.ShowQuantity}}<td class="num">{{.Quantity}}</td>{{end}}
+          {{if or (not $.Branding) $.Branding.ShowUnitPrice}}<td class="num">{{.UnitPrice}}</td>{{end}}
+          {{if or (not $.Branding) $.Branding.ShowTax}}<td class="num">{{.TaxLabel}}</td>{{end}}
+          {{if or (not $.Branding) $.Branding.ShowLineTotal}}<td class="num">{{.LineTotal}}</td>{{end}}
         </tr>
         {{end}}
       </tbody>

@@ -13,6 +13,7 @@
       --accent: #4f46e5;
       --accent-soft: #eef2ff;
     }
+    {{template "branding-accent-css" .}}
     * { box-sizing: border-box; }
     body {
       margin: 0;
@@ -131,6 +132,7 @@
       {{if (.Layout.Show "header")}}
       <div class="gi-block head" data-block-id="header" style="order: {{.Layout.Ord "header"}}">
         <div>
+          {{template "branding-logo" .}}
           <div class="brand">Invoice from</div>
           <h1 class="seller-name">{{.Seller.Name}}</h1>
         </div>
@@ -168,22 +170,16 @@
       <div class="gi-block" data-block-id="line_items" style="order: {{.Layout.Ord "line_items"}}">
       <table class="items">
         <thead>
-          <tr>
-            <th>Description</th>
-            <th class="num">Qty</th>
-            <th class="num">Unit price</th>
-            <th class="num">Tax</th>
-            <th class="num">Amount</th>
-          </tr>
+          <tr>{{template "line-head-en" .}}</tr>
         </thead>
         <tbody>
           {{range .Lines}}
           <tr>
             <td>{{.Description}}</td>
-            <td class="num">{{.Quantity}}</td>
-            <td class="num">{{.UnitPrice}}</td>
-            <td class="num">{{.TaxLabel}}</td>
-            <td class="num">{{.LineTotal}}</td>
+            {{if or (not $.Branding) $.Branding.ShowQuantity}}<td class="num">{{.Quantity}}</td>{{end}}
+            {{if or (not $.Branding) $.Branding.ShowUnitPrice}}<td class="num">{{.UnitPrice}}</td>{{end}}
+            {{if or (not $.Branding) $.Branding.ShowTax}}<td class="num">{{.TaxLabel}}</td>{{end}}
+            {{if or (not $.Branding) $.Branding.ShowLineTotal}}<td class="num">{{.LineTotal}}</td>{{end}}
           </tr>
           {{end}}
         </tbody>

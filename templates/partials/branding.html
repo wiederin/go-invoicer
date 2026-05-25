@@ -1,0 +1,13 @@
+{{define "branding-logo"}}
+{{if and .Branding .Branding.LogoURL}}<img class="logo" src="{{.Branding.LogoURL}}" alt="" style="max-height:48px;max-width:200px;margin-bottom:12px;display:block">{{end}}
+{{end}}
+{{define "branding-accent-css"}}
+{{if and .Branding .Branding.AccentColor}}:root { --accent: {{.Branding.AccentColor}}; }{{end}}
+{{end}}
+{{define "line-head-en"}}
+<th>Description</th>
+{{if or (not .Branding) .Branding.ShowQuantity}}<th class="num">Qty</th>{{end}}
+{{if or (not .Branding) .Branding.ShowUnitPrice}}<th class="num">Unit</th>{{end}}
+{{if or (not .Branding) .Branding.ShowTax}}<th class="num">Tax</th>{{end}}
+{{if or (not .Branding) .Branding.ShowLineTotal}}<th class="num">Amount</th>{{end}}
+{{end}}

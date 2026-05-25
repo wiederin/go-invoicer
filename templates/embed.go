@@ -5,7 +5,7 @@ import "embed"
 
 // FS contains all embedded HTML templates.
 //
-//go:embed default/*.html minimal/*.html swiss-qr/*.html multilingual/*.html modern/*.html studio/*.html stratosphere/*.html ocean/*.html ledger/*.html mist/*.html
+//go:embed partials/*.html default/*.html minimal/*.html swiss-qr/*.html multilingual/*.html modern/*.html studio/*.html stratosphere/*.html ocean/*.html ledger/*.html mist/*.html
 var FS embed.FS
 
 // Template file names (ParseFS uses the file basename as template name).
