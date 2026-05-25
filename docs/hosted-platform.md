@@ -16,6 +16,8 @@ This page describes what each subscription tier unlocks, how gates work in the A
 
 Subscribe from the dashboard **Billing** page (`POST /v1/billing/checkout`). Owners and admins manage checkout; members use features allowed by RBAC.
 
+**Platform administrators** configure tier limits and feature slugs under **Plans** (`/admin/billing`): max invoices per month, overage allowance/price, and checkboxes for each feature gate. Changes persist in `billing_plans` and apply immediately to orgs on that plan. API: `GET /v1/admin/billing/features`, `PUT /v1/admin/billing/plans/:id`.
+
 Check current plan and usage:
 
 ```http
