@@ -15,6 +15,8 @@ go get github.com/wiederin/go-invoicer@latest
 
 See [Getting started](getting-started.md).
 
+Using the **hosted dashboard and API**? See [Hosted platform — plans & paid features](hosted-platform.md) for subscription tiers, feature gates, and what is included on every plan.
+
 ## Build docs locally
 
 ```bash

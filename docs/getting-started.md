@@ -61,6 +61,10 @@ apiInv, _ := stripe.InvoiceFromEvent(ev)
 domain := apiInv.ToDomainInvoice().ToDomain(opts)
 ```
 
+## Hosted platform
+
+The OSS library runs locally without a subscription. If you use the **hosted API and dashboard**, plans gate integrations, compliance exports, e-invoices, and logo/accent branding — while line-item columns, numbering, and cron schedules stay on every tier. See [Hosted platform — plans & paid features](hosted-platform.md).
+
 ## Release v0.1.0
 
 After mirroring to GitHub, tag the public repo:

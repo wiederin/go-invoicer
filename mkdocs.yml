@@ -16,6 +16,7 @@ theme:
 nav:
   - Home: index.md
   - Getting started: getting-started.md
+  - Hosted platform & plans: hosted-platform.md
   - Templates: templates.md
   - Swiss QR-bill: swiss-qr.md
   - Stripe: stripe.md
