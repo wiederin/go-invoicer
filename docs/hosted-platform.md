@@ -53,6 +53,8 @@ Feature slugs are stored on `billing_plans.features` and returned in `subscripti
     - **Line item columns** — show/hide quantity, unit price, tax, line total; optional custom column headers (`PATCH /v1/org/rendering` → `line_columns`).
     - **Invoice numbering** — prefix, pattern, auto-assign on create (`GET /v1/invoices/next-number`).
     - **Scheduled invoices** — cron schedules (`/v1/invoice-schedules`, Settings → Scheduled invoices). Disable the worker with `INVOICE_SCHEDULER_ENABLED=false` on the API.
+    - **Inbound hook** — per-org secret URL (`POST /v1/hooks/{token}/invoices`) for ERP/Zapier without an API key; rotate in Settings → Automation.
+    - **Invoice generate API** — `POST /v1/invoices/generate` with optional `render_pdf` and `sync_stripe` (same body as inbound hook; requires Bearer token).
     - **Template & locale defaults**, block layout, usage history charts (within invoice quota).
 
 ## Paid features in detail
