@@ -8,6 +8,11 @@ type BrandingView struct {
 	ShowUnitPrice bool
 	ShowTax       bool
 	ShowLineTotal bool
+	LabelDescription string
+	LabelQuantity    string
+	LabelUnitPrice   string
+	LabelTax         string
+	LabelLineTotal   string
 }
 
 // DefaultBrandingView shows all standard line columns and no logo override.

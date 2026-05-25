@@ -5,9 +5,9 @@
 {{if and .Branding .Branding.AccentColor}}:root { --accent: {{.Branding.AccentColor}}; }{{end}}
 {{end}}
 {{define "line-head-en"}}
-<th>Description</th>
-{{if or (not .Branding) .Branding.ShowQuantity}}<th class="num">Qty</th>{{end}}
-{{if or (not .Branding) .Branding.ShowUnitPrice}}<th class="num">Unit</th>{{end}}
-{{if or (not .Branding) .Branding.ShowTax}}<th class="num">Tax</th>{{end}}
-{{if or (not .Branding) .Branding.ShowLineTotal}}<th class="num">Amount</th>{{end}}
+<th>{{if .Branding}}{{.Branding.LabelDescription}}{{else}}Description{{end}}</th>
+{{if or (not .Branding) .Branding.ShowQuantity}}<th class="num">{{if .Branding}}{{.Branding.LabelQuantity}}{{else}}Qty{{end}}</th>{{end}}
+{{if or (not .Branding) .Branding.ShowUnitPrice}}<th class="num">{{if .Branding}}{{.Branding.LabelUnitPrice}}{{else}}Unit{{end}}</th>{{end}}
+{{if or (not .Branding) .Branding.ShowTax}}<th class="num">{{if .Branding}}{{.Branding.LabelTax}}{{else}}Tax{{end}}</th>{{end}}
+{{if or (not .Branding) .Branding.ShowLineTotal}}<th class="num">{{if .Branding}}{{.Branding.LabelLineTotal}}{{else}}Amount{{end}}</th>{{end}}
 {{end}}

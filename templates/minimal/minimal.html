@@ -4,19 +4,23 @@
   <meta charset="utf-8">
   <title>Invoice {{.Number}}</title>
   <style>
+    {{template "branding-accent-css" .}}
     body { font-family: Georgia, serif; max-width: 640px; margin: 48px auto; color: #222; line-height: 1.6; display: flex; flex-direction: column; }
     .gi-block { display: block; }
+    .logo { max-height: 48px; max-width: 200px; margin-bottom: 12px; display: block; }
     h1 { font-size: 22px; font-weight: normal; border-bottom: 1px solid #222; padding-bottom: 8px; }
     .meta { font-size: 13px; color: #555; margin-bottom: 24px; }
     table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 14px; }
-    td { padding: 6px 0; border-bottom: 1px solid #eee; }
-    td:last-child { text-align: right; }
+    th, td { padding: 6px 8px; border-bottom: 1px solid #eee; }
+    th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: #666; }
+    .num { text-align: right; }
     .total { font-weight: bold; border-top: 2px solid #222; }
   </style>
 </head>
 <body>
   {{if (.Layout.Show "header")}}
   <div class="gi-block" data-block-id="header" style="order: {{.Layout.Ord "header"}}">
+    {{template "branding-logo" .}}
     <h1>Invoice {{.Number}}</h1>
     <p class="meta">{{.IssuedAt}}{{if .DueAt}} · due {{.DueAt}}{{end}}</p>
   </div>
@@ -29,16 +33,25 @@
   {{if (.Layout.Show "line_items")}}
   <div class="gi-block" data-block-id="line_items" style="order: {{.Layout.Ord "line_items"}}">
   <table>
-    {{range .Lines}}
-    <tr><td>{{.Description}} × {{.Quantity}}</td><td>{{.LineTotal}}</td></tr>
-    {{end}}
+    <thead><tr>{{template "line-head-en" .}}</tr></thead>
+    <tbody>
+      {{range .Lines}}
+      <tr>
+        <td>{{.Description}}</td>
+        {{if or (not $.Branding) $.Branding.ShowQuantity}}<td class="num">{{.Quantity}}</td>{{end}}
+        {{if or (not $.Branding) $.Branding.ShowUnitPrice}}<td class="num">{{.UnitPrice}}</td>{{end}}
+        {{if or (not $.Branding) $.Branding.ShowTax}}<td class="num">{{.TaxLabel}}</td>{{end}}
+        {{if or (not $.Branding) $.Branding.ShowLineTotal}}<td class="num">{{.LineTotal}}</td>{{end}}
+      </tr>
+      {{end}}
+    </tbody>
   </table>
   </div>
   {{end}}
   {{if (.Layout.Show "totals")}}
   <div class="gi-block" data-block-id="totals" style="order: {{.Layout.Ord "totals"}}">
   <table>
-    <tr class="total"><td>Total</td><td>{{.Total}}</td></tr>
+    <tr class="total"><td>Total</td><td class="num">{{.Total}}</td></tr>
   </table>
   </div>
   {{end}}

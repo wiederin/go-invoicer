@@ -37,11 +37,11 @@
   <table>
     <thead>
       <tr>
-        <th>{{.Labels.Description}}</th>
-        {{if or (not .Branding) .Branding.ShowQuantity}}<th class="num">{{.Labels.Quantity}}</th>{{end}}
-        {{if or (not .Branding) .Branding.ShowUnitPrice}}<th class="num">{{.Labels.UnitPrice}}</th>{{end}}
-        {{if or (not .Branding) .Branding.ShowTax}}<th class="num">{{.Labels.Tax}}</th>{{end}}
-        {{if or (not .Branding) .Branding.ShowLineTotal}}<th class="num">{{.Labels.Amount}}</th>{{end}}
+        <th>{{if and .Branding .Branding.LabelDescription}}{{.Branding.LabelDescription}}{{else}}{{.Labels.Description}}{{end}}</th>
+        {{if or (not .Branding) .Branding.ShowQuantity}}<th class="num">{{if and .Branding .Branding.LabelQuantity}}{{.Branding.LabelQuantity}}{{else}}{{.Labels.Quantity}}{{end}}</th>{{end}}
+        {{if or (not .Branding) .Branding.ShowUnitPrice}}<th class="num">{{if and .Branding .Branding.LabelUnitPrice}}{{.Branding.LabelUnitPrice}}{{else}}{{.Labels.UnitPrice}}{{end}}</th>{{end}}
+        {{if or (not .Branding) .Branding.ShowTax}}<th class="num">{{if and .Branding .Branding.LabelTax}}{{.Branding.LabelTax}}{{else}}{{.Labels.Tax}}{{end}}</th>{{end}}
+        {{if or (not .Branding) .Branding.ShowLineTotal}}<th class="num">{{if and .Branding .Branding.LabelLineTotal}}{{.Branding.LabelLineTotal}}{{else}}{{.Labels.Amount}}{{end}}</th>{{end}}
       </tr>
     </thead>
     <tbody>
