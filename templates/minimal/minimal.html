@@ -16,18 +16,18 @@
 </head>
 <body>
   {{if (.Layout.Show "header")}}
-  <div class="gi-block" style="order: {{.Layout.Ord "header"}}">
+  <div class="gi-block" data-block-id="header" style="order: {{.Layout.Ord "header"}}">
     <h1>Invoice {{.Number}}</h1>
     <p class="meta">{{.IssuedAt}}{{if .DueAt}} · due {{.DueAt}}{{end}}</p>
   </div>
   {{end}}
   {{if (.Layout.Show "parties")}}
-  <div class="gi-block" style="order: {{.Layout.Ord "parties"}}">
+  <div class="gi-block" data-block-id="parties" style="order: {{.Layout.Ord "parties"}}">
     <p><strong>{{.Seller.Name}}</strong> → {{.Buyer.Name}}</p>
   </div>
   {{end}}
   {{if (.Layout.Show "line_items")}}
-  <div class="gi-block" style="order: {{.Layout.Ord "line_items"}}">
+  <div class="gi-block" data-block-id="line_items" style="order: {{.Layout.Ord "line_items"}}">
   <table>
     {{range .Lines}}
     <tr><td>{{.Description}} × {{.Quantity}}</td><td>{{.LineTotal}}</td></tr>
@@ -36,14 +36,14 @@
   </div>
   {{end}}
   {{if (.Layout.Show "totals")}}
-  <div class="gi-block" style="order: {{.Layout.Ord "totals"}}">
+  <div class="gi-block" data-block-id="totals" style="order: {{.Layout.Ord "totals"}}">
   <table>
     <tr class="total"><td>Total</td><td>{{.Total}}</td></tr>
   </table>
   </div>
   {{end}}
   {{if and (.Layout.Show "notes") .Notes}}
-  <div class="gi-block" style="order: {{.Layout.Ord "notes"}}">
+  <div class="gi-block" data-block-id="notes" style="order: {{.Layout.Ord "notes"}}">
     <p>{{.Notes}}</p>
   </div>
   {{end}}

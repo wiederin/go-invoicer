@@ -154,7 +154,7 @@
 </head>
 <body>
   {{if (.Layout.Show "header")}}
-  <header class="hero gi-block" style="order: {{.Layout.Ord "header"}}">
+  <header class="hero gi-block" data-block-id="header" style="order: {{.Layout.Ord "header"}}">
     <div class="hero-top">
       <div>
         <h1>Invoice</h1>
@@ -171,7 +171,7 @@
 
   <div class="body">
     {{if (.Layout.Show "parties")}}
-    <div class="gi-block parties" style="order: {{.Layout.Ord "parties"}}">
+    <div class="gi-block parties" data-block-id="parties" style="order: {{.Layout.Ord "parties"}}">
       <div>
         <h2>From</h2>
         <div class="name">{{.Seller.Name}}</div>
@@ -190,7 +190,7 @@
     {{end}}
 
     {{if (.Layout.Show "line_items")}}
-    <div class="gi-block" style="order: {{.Layout.Ord "line_items"}}">
+    <div class="gi-block" data-block-id="line_items" style="order: {{.Layout.Ord "line_items"}}">
     <table class="lines">
       <thead>
         <tr>
@@ -217,7 +217,7 @@
     {{end}}
 
     {{if (.Layout.Show "totals")}}
-    <div class="gi-block summary" style="order: {{.Layout.Ord "totals"}}">
+    <div class="gi-block summary" data-block-id="totals" style="order: {{.Layout.Ord "totals"}}">
       <div class="summary-box">
         <table>
           <tr><td>Subtotal</td><td>{{.Subtotal}}</td></tr>
@@ -231,7 +231,7 @@
     {{end}}
 
     {{if and (.Layout.Show "notes") .Notes}}
-    <div class="gi-block notes" style="order: {{.Layout.Ord "notes"}}">
+    <div class="gi-block notes" data-block-id="notes" style="order: {{.Layout.Ord "notes"}}">
       <h2>Notes</h2>
       <p>{{.Notes}}</p>
     </div>

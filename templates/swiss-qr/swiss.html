@@ -19,19 +19,19 @@
 </head>
 <body>
   {{if (.Layout.Show "header")}}
-  <div class="gi-block" style="order: {{.Layout.Ord "header"}}">
+  <div class="gi-block" data-block-id="header" style="order: {{.Layout.Ord "header"}}">
     <h1>Rechnung {{.Number}}</h1>
     <p>{{.IssuedAt}}{{if .DueAt}} · Zahlbar bis {{.DueAt}}{{end}}</p>
   </div>
   {{end}}
   {{if (.Layout.Show "parties")}}
-  <div class="gi-block" style="order: {{.Layout.Ord "parties"}}">
+  <div class="gi-block" data-block-id="parties" style="order: {{.Layout.Ord "parties"}}">
     <p><strong>{{.Seller.Name}}</strong><br>{{.Seller.Address}}</p>
     <p><strong>{{.Buyer.Name}}</strong><br>{{.Buyer.Address}}</p>
   </div>
   {{end}}
   {{if or (.Layout.Show "line_items") (.Layout.Show "totals") (.Layout.Show "payment") (.Layout.Show "notes")}}
-  <div class="gi-block layout" style="order: {{.Layout.Ord "line_items"}}">
+  <div class="gi-block layout" data-block-id="line_items" style="order: {{.Layout.Ord "line_items"}}">
     <div>
       {{if (.Layout.Show "line_items")}}
       <table>
@@ -52,7 +52,7 @@
       {{if and (.Layout.Show "notes") .Notes}}<p>{{.Notes}}</p>{{end}}
     </div>
     {{if (.Layout.Show "payment")}}
-    <div class="qr-box" style="order: {{.Layout.Ord "payment"}}">
+    <div class="qr-box" data-block-id="payment" style="order: {{.Layout.Ord "payment"}}">
       <img src="{{.QRImage}}" alt="Swiss QR-bill">
       <p>Scannen zum Bezahlen</p>
     </div>

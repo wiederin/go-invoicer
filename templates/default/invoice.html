@@ -97,7 +97,7 @@
 </head>
 <body>
   {{if (.Layout.Show "header")}}
-  <div class="gi-block top" style="order: {{.Layout.Ord "header"}}">
+  <div class="gi-block top" data-block-id="header" style="order: {{.Layout.Ord "header"}}">
     <div>
       {{if and .Branding .Branding.LogoURL}}<img class="logo" src="{{.Branding.LogoURL}}" alt="">{{end}}
       <h1>Invoice</h1>
@@ -111,7 +111,7 @@
   {{end}}
 
   {{if (.Layout.Show "parties")}}
-  <div class="gi-block parties" style="order: {{.Layout.Ord "parties"}}">
+  <div class="gi-block parties" data-block-id="parties" style="order: {{.Layout.Ord "parties"}}">
     <div class="party">
       <h2>From</h2>
       <strong>{{.Seller.Name}}</strong><br>
@@ -130,7 +130,7 @@
   {{end}}
 
   {{if (.Layout.Show "line_items")}}
-  <div class="gi-block" style="order: {{.Layout.Ord "line_items"}}">
+  <div class="gi-block" data-block-id="line_items" style="order: {{.Layout.Ord "line_items"}}">
   <table>
     <thead>
       <tr>
@@ -157,7 +157,7 @@
   {{end}}
 
   {{if (.Layout.Show "totals")}}
-  <div class="gi-block" style="order: {{.Layout.Ord "totals"}}">
+  <div class="gi-block" data-block-id="totals" style="order: {{.Layout.Ord "totals"}}">
   <table class="totals">
     <tr><td>Subtotal</td><td>{{.Subtotal}}</td></tr>
     {{range .TaxLines}}
@@ -169,7 +169,7 @@
   {{end}}
 
   {{if and (.Layout.Show "notes") .Notes}}
-  <div class="gi-block notes" style="order: {{.Layout.Ord "notes"}}">
+  <div class="gi-block notes" data-block-id="notes" style="order: {{.Layout.Ord "notes"}}">
     <h2>Notes</h2>
     <p>{{.Notes}}</p>
   </div>
