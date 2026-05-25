@@ -63,6 +63,7 @@ func (c *Client) FetchInvoice(ctx context.Context, invoiceID string) (Invoice, e
 
 type apiInvoice struct {
 	Id        string `json:"Id"`
+	SyncToken string `json:"SyncToken"`
 	DocNumber string `json:"DocNumber"`
 	CurrencyRef struct {
 		Value string `json:"value"`
@@ -92,6 +93,7 @@ type apiInvoice struct {
 // Invoice is the import view of a QuickBooks invoice.
 type Invoice struct {
 	ID            string
+	SyncToken     string
 	Number        string
 	Currency      string
 	IssuedAt      time.Time
@@ -184,6 +186,7 @@ func mapAPIInvoice(inv apiInvoice) Invoice {
 	name := inv.CustomerRef.Name
 	return Invoice{
 		ID:            inv.Id,
+		SyncToken:     inv.SyncToken,
 		Number:        inv.DocNumber,
 		Currency:      cur,
 		IssuedAt:      issued,

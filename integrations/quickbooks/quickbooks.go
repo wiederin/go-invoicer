@@ -25,7 +25,10 @@ func (s Service) ImportExternal(ctx context.Context, _, externalID string) (*dom
 	return inv.ToDomain(ImportOptions{Supplier: s.Supplier}), nil
 }
 
-// PushInvoice is not implemented yet.
-func (Service) PushInvoice(context.Context, string, *domain.Invoice) (string, error) {
-	return "", fmt.Errorf("quickbooks: export not implemented yet")
+// PushInvoice creates or updates a QuickBooks draft invoice.
+func (s Service) PushInvoice(ctx context.Context, _ string, inv *domain.Invoice) (string, error) {
+	if s.Client == nil {
+		return "", fmt.Errorf("quickbooks: client not configured")
+	}
+	return s.Client.PushInvoice(ctx, inv, ExportOptions{})
 }

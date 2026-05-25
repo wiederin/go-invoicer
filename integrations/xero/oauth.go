@@ -49,7 +49,8 @@ func (c OAuthConfig) OAuthEndpoint() *oauth2.Config {
 		RedirectURL:  c.RedirectURL,
 		Scopes: []string{
 			"openid", "profile", "email",
-			"accounting.transactions.read",
+			"accounting.transactions",
+			"accounting.contacts",
 			"offline_access",
 		},
 		Endpoint: oauth2.Endpoint{

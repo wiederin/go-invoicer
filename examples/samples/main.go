@@ -48,6 +48,10 @@ func main() {
 		{"invoice-default.pdf", func() (string, error) { return engine.RenderDefault(inv) }},
 		{"invoice-modern.pdf", func() (string, error) { return engine.RenderModern(inv) }},
 		{"invoice-studio.pdf", func() (string, error) { return engine.RenderStudio(inv) }},
+		{"invoice-stratosphere.pdf", func() (string, error) { return engine.RenderStratosphere(inv) }},
+		{"invoice-ocean.pdf", func() (string, error) { return engine.RenderOcean(inv) }},
+		{"invoice-ledger.pdf", func() (string, error) { return engine.RenderLedger(inv) }},
+		{"invoice-mist.pdf", func() (string, error) { return engine.RenderMist(inv) }},
 		{"invoice-minimal.pdf", func() (string, error) { return engine.RenderMinimal(inv) }},
 		{"invoice-multilingual-en.pdf", func() (string, error) {
 			return engine.RenderMultilingual(inv, i18n.LocaleEN)

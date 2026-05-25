@@ -72,6 +72,37 @@ func TestRenderStudio(t *testing.T) {
 	}
 }
 
+func TestRenderBrandingPackTemplates(t *testing.T) {
+	engine, err := render.DefaultEngine()
+	if err != nil {
+		t.Fatal(err)
+	}
+	inv := sampleInvoice(t)
+	cases := []struct {
+		name string
+		fn   func(*invoice.Invoice) (string, error)
+		want []string
+	}{
+		{"stratosphere", engine.RenderStratosphere, []string{"INV-TPL-1", "sky-bar", "Total due"}},
+		{"ocean", engine.RenderOcean, []string{"INV-TPL-1", "class=\"hero\"", "Total due"}},
+		{"ledger", engine.RenderLedger, []string{"INV-TPL-1", "Tax invoice", "Space Mono"}},
+		{"mist", engine.RenderMist, []string{"INV-TPL-1", "class=\"sheet\"", "Total due"}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			html, err := tc.fn(inv)
+			if err != nil {
+				t.Fatal(err)
+			}
+			for _, w := range tc.want {
+				if !strings.Contains(html, w) {
+					t.Fatalf("missing %q", w)
+				}
+			}
+		})
+	}
+}
+
 func TestRenderMultilingualDE(t *testing.T) {
 	engine, err := render.DefaultEngine()
 	if err != nil {

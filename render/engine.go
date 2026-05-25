@@ -32,7 +32,8 @@ func NewEngine(fsys fs.FS, patterns ...string) (*Engine, error) {
 func DefaultEngine() (*Engine, error) {
 	return NewEngine(templates.FS,
 		"default/*.html", "minimal/*.html", "swiss-qr/*.html", "multilingual/*.html",
-		"modern/*.html", "studio/*.html")
+		"modern/*.html", "studio/*.html",
+		"stratosphere/*.html", "ocean/*.html", "ledger/*.html", "mist/*.html")
 }
 
 // RenderOptions configures a render call.
@@ -75,6 +76,26 @@ func (e *Engine) RenderModern(inv *invoice.Invoice) (string, error) {
 // RenderStudio renders the editorial studio template.
 func (e *Engine) RenderStudio(inv *invoice.Invoice) (string, error) {
 	return e.RenderInvoice(inv, templates.StudioInvoice)
+}
+
+// RenderStratosphere renders the Stratosphere branding-pack template.
+func (e *Engine) RenderStratosphere(inv *invoice.Invoice) (string, error) {
+	return e.RenderInvoice(inv, templates.StratosphereInvoice)
+}
+
+// RenderOcean renders the Ocean branding-pack template.
+func (e *Engine) RenderOcean(inv *invoice.Invoice) (string, error) {
+	return e.RenderInvoice(inv, templates.OceanInvoice)
+}
+
+// RenderLedger renders the Ledger branding-pack template.
+func (e *Engine) RenderLedger(inv *invoice.Invoice) (string, error) {
+	return e.RenderInvoice(inv, templates.LedgerInvoice)
+}
+
+// RenderMist renders the Mist branding-pack template.
+func (e *Engine) RenderMist(inv *invoice.Invoice) (string, error) {
+	return e.RenderInvoice(inv, templates.MistInvoice)
 }
 
 // RenderInvoice renders an invoice with the named template (e.g. "default/invoice.html").

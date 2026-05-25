@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Invoice {{.Number}}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --void: #07111f; --muted: #4a7a9b; --sky: #38a8ff; --line: #d8e8f5; --paper: #fff; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 40px 44px; font-family: "Outfit", system-ui, sans-serif; font-size: 13px; color: var(--void); background: var(--paper); }
+    .top { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid var(--void); padding-bottom: 20px; margin-bottom: 28px; }
+    .top h1 { margin: 0; font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+    .top .seller { margin-top: 6px; font-size: 22px; font-weight: 600; letter-spacing: -0.03em; }
+    .top .meta { text-align: right; font-family: "Space Mono", ui-monospace, monospace; font-size: 11px; color: var(--muted); line-height: 1.8; }
+    .top .meta .num { display: block; font-size: 16px; font-weight: 700; color: var(--sky); margin-bottom: 4px; }
+    .parties { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 28px; font-size: 12px; }
+    .parties h2 { margin: 0 0 6px; font-family: "Space Mono", ui-monospace, monospace; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+    table.items { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 12px; }
+    table.items thead th { padding: 8px 10px; font-family: "Space Mono", ui-monospace, monospace; font-size: 9px; letter-spacing: .08em; text-transform: uppercase; text-align: left; border-bottom: 2px solid var(--void); color: var(--muted); }
+    table.items tbody td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    .num { text-align: right; font-family: "Space Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .footer { display: flex; justify-content: flex-end; }
+    table.totals { width: 300px; border-collapse: collapse; font-family: "Space Mono", ui-monospace, monospace; font-size: 12px; }
+    table.totals td { padding: 5px 0; color: var(--muted); }
+    table.totals td:last-child { text-align: right; color: var(--void); }
+    table.totals tr.grand td { border-top: 2px solid var(--void); padding-top: 10px; font-size: 14px; font-weight: 700; }
+    .notes { margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); }
+    .notes h2 { margin: 0 0 6px; font-family: "Space Mono", ui-monospace, monospace; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <div><h1>Tax invoice</h1><div class="seller">{{.Seller.Name}}</div></div>
+    <div class="meta"><span class="num">{{.Number}}</span>Issued {{.IssuedAt}}{{if .DueAt}}<br>Due {{.DueAt}}{{end}}</div>
+  </div>
+  <div class="parties">
+    <div><h2>From</h2><strong>{{.Seller.Name}}</strong><br>{{if .Seller.Email}}{{.Seller.Email}}<br>{{end}}{{if .Seller.VATID}}VAT {{.Seller.VATID}}<br>{{end}}{{.Seller.Address}}</div>
+    <div><h2>Bill to</h2><strong>{{.Buyer.Name}}</strong><br>{{if .Buyer.Email}}{{.Buyer.Email}}<br>{{end}}{{if .Buyer.VATID}}VAT {{.Buyer.VATID}}<br>{{end}}{{.Buyer.Address}}</div>
+  </div>
+  <table class="items">
+    <thead><tr><th>Description</th><th class="num">Qty</th><th class="num">Unit</th><th class="num">Tax</th><th class="num">Amount</th></tr></thead>
+    <tbody>{{range .Lines}}<tr><td>{{.Description}}</td><td class="num">{{.Quantity}}</td><td class="num">{{.UnitPrice}}</td><td class="num">{{.TaxLabel}}</td><td class="num">{{.LineTotal}}</td></tr>{{end}}</tbody>
+  </table>
+  <div class="footer"><table class="totals"><tr><td>Subtotal</td><td>{{.Subtotal}}</td></tr>{{range .TaxLines}}<tr><td>{{.Label}}</td><td>{{.Amount}}</td></tr>{{end}}<tr class="grand"><td>Total due</td><td>{{.Total}}</td></tr></table></div>
+  {{if .Notes}}<div class="notes"><h2>Notes</h2><p>{{.Notes}}</p></div>{{end}}
+</body>
+</html>

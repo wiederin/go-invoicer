@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Invoice {{.Number}}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --sky: #38a8ff;
+      --ocean: #1a7dd4;
+      --mist: #daeeff;
+      --cloud: #f0f7ff;
+      --void: #07111f;
+      --muted: #4a7a9b;
+      --line: rgba(56, 168, 255, 0.2);
+      --radius: 14px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 32px;
+      font-family: "Outfit", system-ui, sans-serif;
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--void);
+      background: var(--cloud);
+      letter-spacing: -0.02em;
+    }
+    .sheet {
+      max-width: 820px;
+      margin: 0 auto;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 12px 32px rgba(56, 168, 255, 0.08);
+    }
+    .sky-bar { height: 4px; background: linear-gradient(90deg, var(--sky), var(--ocean)); }
+    .inner { padding: 40px 44px 44px; }
+    .head { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; margin-bottom: 32px; }
+    .eyebrow { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--sky); margin-bottom: 6px; }
+    .seller-name { margin: 0; font-size: 24px; font-weight: 600; color: var(--void); }
+    .badge { text-align: right; padding: 16px 20px; background: var(--mist); border-radius: 8px; min-width: 200px; }
+    .badge .label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+    .badge .number { font-size: 20px; font-weight: 700; color: var(--sky); margin-top: 4px; }
+    .badge .dates { margin-top: 8px; font-size: 12px; color: var(--muted); }
+    .parties { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
+    .party { padding: 16px 18px; border-radius: 8px; border: 1px solid var(--line); background: var(--cloud); }
+    .party h2 { margin: 0 0 8px; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+    table.items { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+    table.items thead th { padding: 10px 12px; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; text-align: left; color: #fff; background: var(--sky); }
+    table.items thead th:first-child { border-radius: 6px 0 0 0; }
+    table.items thead th:last-child { border-radius: 0 6px 0 0; }
+    table.items tbody td { padding: 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    table.items tbody tr:nth-child(even) td { background: rgba(240, 247, 255, 0.6); }
+    .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .footer { display: flex; justify-content: flex-end; }
+    table.totals { width: 260px; border-collapse: collapse; }
+    table.totals td { padding: 6px 0; color: var(--muted); }
+    table.totals td:last-child { text-align: right; font-variant-numeric: tabular-nums; color: var(--void); }
+    table.totals tr.grand td { padding-top: 12px; border-top: 2px solid var(--sky); font-size: 17px; font-weight: 700; color: var(--void); }
+    .notes { margin-top: 28px; padding: 16px 18px; border-radius: 8px; border: 1px dashed var(--line); background: var(--cloud); }
+    .notes h2 { margin: 0 0 6px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+    .notes p { margin: 0; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="sheet">
+    <div class="sky-bar"></div>
+    <div class="inner">
+      <div class="head">
+        <div>
+          <div class="eyebrow">Invoice from</div>
+          <h1 class="seller-name">{{.Seller.Name}}</h1>
+        </div>
+        <div class="badge">
+          <div class="label">Invoice</div>
+          <div class="number">{{.Number}}</div>
+          <div class="dates">Issued {{.IssuedAt}}{{if .DueAt}}<br>Due {{.DueAt}}{{end}}</div>
+        </div>
+      </div>
+      <div class="parties">
+        <div class="party"><h2>From</h2><strong>{{.Seller.Name}}</strong><br>{{if .Seller.Email}}{{.Seller.Email}}<br>{{end}}{{if .Seller.VATID}}VAT {{.Seller.VATID}}<br>{{end}}{{.Seller.Address}}</div>
+        <div class="party"><h2>Bill to</h2><strong>{{.Buyer.Name}}</strong><br>{{if .Buyer.Email}}{{.Buyer.Email}}<br>{{end}}{{if .Buyer.VATID}}VAT {{.Buyer.VATID}}<br>{{end}}{{.Buyer.Address}}</div>
+      </div>
+      <table class="items">
+        <thead><tr><th>Description</th><th class="num">Qty</th><th class="num">Unit</th><th class="num">Tax</th><th class="num">Amount</th></tr></thead>
+        <tbody>{{range .Lines}}<tr><td>{{.Description}}</td><td class="num">{{.Quantity}}</td><td class="num">{{.UnitPrice}}</td><td class="num">{{.TaxLabel}}</td><td class="num">{{.LineTotal}}</td></tr>{{end}}</tbody>
+      </table>
+      <div class="footer">
+        <table class="totals">
+          <tr><td>Subtotal</td><td>{{.Subtotal}}</td></tr>
+          {{range .TaxLines}}<tr><td>{{.Label}}</td><td>{{.Amount}}</td></tr>{{end}}
+          <tr class="grand"><td>Total due</td><td>{{.Total}}</td></tr>
+        </table>
+      </div>
+      {{if .Notes}}<div class="notes"><h2>Notes</h2><p>{{.Notes}}</p></div>{{end}}
+    </div>
+  </div>
+</body>
+</html>
