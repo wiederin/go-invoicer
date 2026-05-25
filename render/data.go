@@ -46,6 +46,7 @@ type InvoiceView struct {
 	Notes    string
 	Labels   i18n.Labels
 	Locale   string
+	Branding *BrandingView
 }
 
 // InvoiceViewFrom builds display data from a domain invoice (English labels).
@@ -86,7 +87,7 @@ func InvoiceViewFromLocale(inv *invoice.Invoice, locale i18n.Locale) InvoiceView
 			Amount: currency.FormatMinor(tl.TaxAmount, cur),
 		})
 	}
-	return view
+	return WithBranding(view, nil)
 }
 
 func partyView(p invoice.Party) PartyView {

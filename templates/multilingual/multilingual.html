@@ -13,9 +13,12 @@
     .totals { margin-top: 16px; width: 280px; margin-left: auto; }
     .totals td:last-child { text-align: right; }
     .grand td { font-weight: bold; border-top: 2px solid #111; }
+    .logo { max-height: 48px; max-width: 200px; margin-bottom: 8px; display: block; }
+    {{if and .Branding .Branding.AccentColor}}.grand td { border-top-color: {{.Branding.AccentColor}}; }{{end}}
   </style>
 </head>
 <body>
+  {{if and .Branding .Branding.LogoURL}}<img class="logo" src="{{.Branding.LogoURL}}" alt="">{{end}}
   <h1>{{.Labels.Invoice}} {{.Number}}</h1>
   <p class="meta">{{.Labels.Issued}}: {{.IssuedAt}}{{if .DueAt}} · {{.Labels.Due}}: {{.DueAt}}{{end}}</p>
   <p><strong>{{.Labels.From}}:</strong> {{.Seller.Name}}<br>{{.Seller.Address}}</p>
@@ -24,20 +27,20 @@
     <thead>
       <tr>
         <th>{{.Labels.Description}}</th>
-        <th class="num">{{.Labels.Quantity}}</th>
-        <th class="num">{{.Labels.UnitPrice}}</th>
-        <th class="num">{{.Labels.Tax}}</th>
-        <th class="num">{{.Labels.Amount}}</th>
+        {{if or (not .Branding) .Branding.ShowQuantity}}<th class="num">{{.Labels.Quantity}}</th>{{end}}
+        {{if or (not .Branding) .Branding.ShowUnitPrice}}<th class="num">{{.Labels.UnitPrice}}</th>{{end}}
+        {{if or (not .Branding) .Branding.ShowTax}}<th class="num">{{.Labels.Tax}}</th>{{end}}
+        {{if or (not .Branding) .Branding.ShowLineTotal}}<th class="num">{{.Labels.Amount}}</th>{{end}}
       </tr>
     </thead>
     <tbody>
       {{range .Lines}}
       <tr>
         <td>{{.Description}}</td>
-        <td class="num">{{.Quantity}}</td>
-        <td class="num">{{.UnitPrice}}</td>
-        <td class="num">{{.TaxLabel}}</td>
-        <td class="num">{{.LineTotal}}</td>
+        {{if or (not $.Branding) $.Branding.ShowQuantity}}<td class="num">{{.Quantity}}</td>{{end}}
+        {{if or (not $.Branding) $.Branding.ShowUnitPrice}}<td class="num">{{.UnitPrice}}</td>{{end}}
+        {{if or (not $.Branding) $.Branding.ShowTax}}<td class="num">{{.TaxLabel}}</td>{{end}}
+        {{if or (not $.Branding) $.Branding.ShowLineTotal}}<td class="num">{{.LineTotal}}</td>{{end}}
       </tr>
       {{end}}
     </tbody>
