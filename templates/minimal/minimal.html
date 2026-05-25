@@ -4,7 +4,8 @@
   <meta charset="utf-8">
   <title>Invoice {{.Number}}</title>
   <style>
-    body { font-family: Georgia, serif; max-width: 640px; margin: 48px auto; color: #222; line-height: 1.6; }
+    body { font-family: Georgia, serif; max-width: 640px; margin: 48px auto; color: #222; line-height: 1.6; display: flex; flex-direction: column; }
+    .gi-block { display: block; }
     h1 { font-size: 22px; font-weight: normal; border-bottom: 1px solid #222; padding-bottom: 8px; }
     .meta { font-size: 13px; color: #555; margin-bottom: 24px; }
     table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 14px; }
@@ -14,15 +15,37 @@
   </style>
 </head>
 <body>
-  <h1>Invoice {{.Number}}</h1>
-  <p class="meta">{{.IssuedAt}}{{if .DueAt}} · due {{.DueAt}}{{end}}</p>
-  <p><strong>{{.Seller.Name}}</strong> → {{.Buyer.Name}}</p>
+  {{if (.Layout.Show "header")}}
+  <div class="gi-block" style="order: {{.Layout.Ord "header"}}">
+    <h1>Invoice {{.Number}}</h1>
+    <p class="meta">{{.IssuedAt}}{{if .DueAt}} · due {{.DueAt}}{{end}}</p>
+  </div>
+  {{end}}
+  {{if (.Layout.Show "parties")}}
+  <div class="gi-block" style="order: {{.Layout.Ord "parties"}}">
+    <p><strong>{{.Seller.Name}}</strong> → {{.Buyer.Name}}</p>
+  </div>
+  {{end}}
+  {{if (.Layout.Show "line_items")}}
+  <div class="gi-block" style="order: {{.Layout.Ord "line_items"}}">
   <table>
     {{range .Lines}}
     <tr><td>{{.Description}} × {{.Quantity}}</td><td>{{.LineTotal}}</td></tr>
     {{end}}
+  </table>
+  </div>
+  {{end}}
+  {{if (.Layout.Show "totals")}}
+  <div class="gi-block" style="order: {{.Layout.Ord "totals"}}">
+  <table>
     <tr class="total"><td>Total</td><td>{{.Total}}</td></tr>
   </table>
-  {{if .Notes}}<p>{{.Notes}}</p>{{end}}
+  </div>
+  {{end}}
+  {{if and (.Layout.Show "notes") .Notes}}
+  <div class="gi-block" style="order: {{.Layout.Ord "notes"}}">
+    <p>{{.Notes}}</p>
+  </div>
+  {{end}}
 </body>
 </html>

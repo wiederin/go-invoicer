@@ -105,7 +105,7 @@ func (e *Engine) RenderInvoice(inv *invoice.Invoice, templateName string) (strin
 	if err := inv.Validate(); err != nil {
 		return "", err
 	}
-	data := InvoiceViewFrom(inv)
+	data := WithLayout(InvoiceViewFrom(inv), nil)
 	var buf bytes.Buffer
 	if err := e.templates.ExecuteTemplate(&buf, templateName, data); err != nil {
 		return "", fmt.Errorf("render: execute %s: %w", templateName, err)

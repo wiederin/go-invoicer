@@ -7,11 +7,21 @@ const (
 	BlockLineItems  = "line_items"
 	BlockTotals     = "totals"
 	BlockNotes      = "notes"
+	BlockPayment    = "payment" // Swiss QR-bill and payment details
 )
+
+var defaultBlockOrder = map[string]int{
+	BlockHeader: 0, BlockParties: 1, BlockLineItems: 2, BlockTotals: 3, BlockNotes: 4, BlockPayment: 5,
+}
 
 // DefaultLayoutBlocks is the standard section order for block-based templates.
 func DefaultLayoutBlocks() []string {
 	return []string{BlockHeader, BlockParties, BlockLineItems, BlockTotals, BlockNotes}
+}
+
+// SwissDefaultLayoutBlocks includes payment / QR section.
+func SwissDefaultLayoutBlocks() []string {
+	return append(DefaultLayoutBlocks(), BlockPayment)
 }
 
 // LayoutView controls section visibility and CSS flex order in templates.
@@ -38,6 +48,12 @@ func NewLayoutView(blocks []string) LayoutView {
 
 // Show reports whether a block id is included in the layout.
 func (l LayoutView) Show(name string) bool {
+	if len(l.order) == 0 {
+		if name == BlockPayment {
+			return false
+		}
+		return true
+	}
 	for _, id := range l.order {
 		if id == name {
 			return true
@@ -48,6 +64,12 @@ func (l LayoutView) Show(name string) bool {
 
 // Ord returns flex order for a block (unknown blocks sort last).
 func (l LayoutView) Ord(name string) int {
+	if len(l.order) == 0 {
+		if o, ok := defaultBlockOrder[name]; ok {
+			return o
+		}
+		return 99
+	}
 	for i, id := range l.order {
 		if id == name {
 			return i

@@ -63,7 +63,7 @@ func main() {
 			return engine.RenderMultilingual(inv, i18n.LocaleFR)
 		}},
 		{"invoice-swiss-qr.pdf", func() (string, error) {
-			return engine.RenderSwiss(inv, demoIBAN)
+			return engine.RenderSwiss(inv, demoIBAN, nil)
 		}},
 	}
 

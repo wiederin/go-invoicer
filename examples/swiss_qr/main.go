@@ -61,7 +61,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	html, err := engine.RenderSwiss(inv, demoIBAN)
+	html, err := engine.RenderSwiss(inv, demoIBAN, nil)
 	if err != nil {
 		log.Fatal(err)
 	}

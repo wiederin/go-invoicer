@@ -48,7 +48,7 @@ func BillFromInvoice(inv *invoice.Invoice, iban string) swiss.Bill {
 }
 
 // RenderSwiss renders the Swiss QR-bill template.
-func (e *Engine) RenderSwiss(inv *invoice.Invoice, iban string) (string, error) {
+func (e *Engine) RenderSwiss(inv *invoice.Invoice, iban string, layoutBlocks []string) (string, error) {
 	if err := inv.Validate(); err != nil {
 		return "", err
 	}
@@ -57,6 +57,11 @@ func (e *Engine) RenderSwiss(inv *invoice.Invoice, iban string) (string, error) 
 	if err != nil {
 		return "", err
 	}
+	blocks := layoutBlocks
+	if len(blocks) == 0 {
+		blocks = SwissDefaultLayoutBlocks()
+	}
+	view.InvoiceView = WithLayout(view.InvoiceView, blocks)
 	var buf bytes.Buffer
 	if err := e.templates.ExecuteTemplate(&buf, templates.SwissInvoice, view); err != nil {
 		return "", fmt.Errorf("render: swiss template: %w", err)

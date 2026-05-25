@@ -65,7 +65,7 @@ func TestRenderStudio(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, want := range []string{"INV-TPL-1", "class=\"hero\"", "Total due"} {
+	for _, want := range []string{"INV-TPL-1", "hero gi-block", "Total due"} {
 		if !strings.Contains(html, want) {
 			t.Fatalf("missing %q", want)
 		}
@@ -84,7 +84,7 @@ func TestRenderBrandingPackTemplates(t *testing.T) {
 		want []string
 	}{
 		{"stratosphere", engine.RenderStratosphere, []string{"INV-TPL-1", "sky-bar", "Total due"}},
-		{"ocean", engine.RenderOcean, []string{"INV-TPL-1", "class=\"hero\"", "Total due"}},
+		{"ocean", engine.RenderOcean, []string{"INV-TPL-1", "hero gi-block", "Total due"}},
 		{"ledger", engine.RenderLedger, []string{"INV-TPL-1", "Tax invoice", "Space Mono"}},
 		{"mist", engine.RenderMist, []string{"INV-TPL-1", "class=\"sheet\"", "Total due"}},
 	}
@@ -126,7 +126,7 @@ func TestRenderSwiss(t *testing.T) {
 	inv.Seller.Address = invoice.Address{Line1: "S", PostalCode: "1", City: "Z", Country: "CH"}
 	inv.Buyer.Address = invoice.Address{Line1: "B", PostalCode: "2", City: "C", Country: "CH"}
 
-	html, err := engine.RenderSwiss(inv, "CH9300762011623852957")
+	html, err := engine.RenderSwiss(inv, "CH9300762011623852957", nil)
 	if err != nil {
 		t.Fatal(err)
 	}

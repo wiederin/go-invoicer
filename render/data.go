@@ -88,7 +88,7 @@ func InvoiceViewFromLocale(inv *invoice.Invoice, locale i18n.Locale) InvoiceView
 			Amount: currency.FormatMinor(tl.TaxAmount, cur),
 		})
 	}
-	return WithBranding(view, nil)
+	return WithLayout(WithBranding(view, nil), nil)
 }
 
 func partyView(p invoice.Party) PartyView {
