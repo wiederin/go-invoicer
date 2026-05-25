@@ -61,7 +61,7 @@ Feature slugs are stored on `billing_plans.features` and returned in `subscripti
 - `POST /v1/invoices/:id/stripe/bill` — finalize & send (when **Replace Stripe Invoicing** mode is `finalize_send`).
 - Webhook: `POST /v1/webhooks/stripe/:org_id`.
 
-Integration buttons on the invoice list appear only when Stripe is **configured** (`GET /v1/integrations` → `status: ready`), independent of the plan — but the API still enforces the `stripe` feature.
+Integration buttons on the invoice list appear when the integration is **configured** (`GET /v1/integrations` → `status: ready`) **and** your plan includes the matching feature slug. The API still returns **402** if either check fails.
 
 ### Xero & QuickBooks (`xero`, `quickbooks`) — Pro+
 
