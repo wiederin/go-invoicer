@@ -38,8 +38,9 @@ func DefaultEngine() (*Engine, error) {
 
 // RenderOptions configures a render call.
 type RenderOptions struct {
-	Locale   i18n.Locale
-	Branding *BrandingView
+	Locale       i18n.Locale
+	Branding     *BrandingView
+	LayoutBlocks []string
 }
 
 // RenderWithOptions renders using locale-aware view data.
@@ -51,7 +52,7 @@ func (e *Engine) RenderWithOptions(inv *invoice.Invoice, templateName string, op
 	if locale == "" {
 		locale = i18n.LocaleEN
 	}
-	data := WithBranding(InvoiceViewFromLocale(inv, locale), opts.Branding)
+	data := WithLayout(WithBranding(InvoiceViewFromLocale(inv, locale), opts.Branding), opts.LayoutBlocks)
 	var buf bytes.Buffer
 	if err := e.templates.ExecuteTemplate(&buf, templateName, data); err != nil {
 		return "", fmt.Errorf("render: execute %s: %w", templateName, err)

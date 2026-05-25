@@ -4,7 +4,8 @@
   <meta charset="utf-8">
   <title>{{.Labels.Invoice}} {{.Number}}</title>
   <style>
-    body { font-family: system-ui, sans-serif; margin: 40px; color: #1a1a1a; }
+    body { font-family: system-ui, sans-serif; margin: 40px; color: #1a1a1a; display: flex; flex-direction: column; }
+    .gi-block { display: block; }
     h1 { font-size: 24px; margin-bottom: 4px; }
     .meta { color: #666; margin-bottom: 24px; }
     table { width: 100%; border-collapse: collapse; }
@@ -18,11 +19,21 @@
   </style>
 </head>
 <body>
-  {{if and .Branding .Branding.LogoURL}}<img class="logo" src="{{.Branding.LogoURL}}" alt="">{{end}}
-  <h1>{{.Labels.Invoice}} {{.Number}}</h1>
-  <p class="meta">{{.Labels.Issued}}: {{.IssuedAt}}{{if .DueAt}} · {{.Labels.Due}}: {{.DueAt}}{{end}}</p>
-  <p><strong>{{.Labels.From}}:</strong> {{.Seller.Name}}<br>{{.Seller.Address}}</p>
-  <p><strong>{{.Labels.BillTo}}:</strong> {{.Buyer.Name}}<br>{{.Buyer.Address}}</p>
+  {{if (.Layout.Show "header")}}
+  <div class="gi-block" style="order: {{.Layout.Ord "header"}}">
+    {{if and .Branding .Branding.LogoURL}}<img class="logo" src="{{.Branding.LogoURL}}" alt="">{{end}}
+    <h1>{{.Labels.Invoice}} {{.Number}}</h1>
+    <p class="meta">{{.Labels.Issued}}: {{.IssuedAt}}{{if .DueAt}} · {{.Labels.Due}}: {{.DueAt}}{{end}}</p>
+  </div>
+  {{end}}
+  {{if (.Layout.Show "parties")}}
+  <div class="gi-block" style="order: {{.Layout.Ord "parties"}}">
+    <p><strong>{{.Labels.From}}:</strong> {{.Seller.Name}}<br>{{.Seller.Address}}</p>
+    <p><strong>{{.Labels.BillTo}}:</strong> {{.Buyer.Name}}<br>{{.Buyer.Address}}</p>
+  </div>
+  {{end}}
+  {{if (.Layout.Show "line_items")}}
+  <div class="gi-block" style="order: {{.Layout.Ord "line_items"}}">
   <table>
     <thead>
       <tr>
@@ -45,11 +56,21 @@
       {{end}}
     </tbody>
   </table>
+  </div>
+  {{end}}
+  {{if (.Layout.Show "totals")}}
+  <div class="gi-block" style="order: {{.Layout.Ord "totals"}}">
   <table class="totals">
     <tr><td>{{.Labels.Subtotal}}</td><td>{{.Subtotal}}</td></tr>
     {{range .TaxLines}}<tr><td>{{.Label}}</td><td>{{.Amount}}</td></tr>{{end}}
     <tr class="grand"><td>{{.Labels.TotalDue}}</td><td>{{.Total}}</td></tr>
   </table>
-  {{if .Notes}}<p><strong>{{.Labels.Notes}}:</strong> {{.Notes}}</p>{{end}}
+  </div>
+  {{end}}
+  {{if and (.Layout.Show "notes") .Notes}}
+  <div class="gi-block" style="order: {{.Layout.Ord "notes"}}">
+    <p><strong>{{.Labels.Notes}}:</strong> {{.Notes}}</p>
+  </div>
+  {{end}}
 </body>
 </html>

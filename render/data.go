@@ -47,6 +47,7 @@ type InvoiceView struct {
 	Labels   i18n.Labels
 	Locale   string
 	Branding *BrandingView
+	Layout   LayoutView
 }
 
 // InvoiceViewFrom builds display data from a domain invoice (English labels).
