@@ -1,9 +1,10 @@
 package render
 
-// BrandingView controls optional logo, accent color, and line-item columns on PDF/HTML templates.
+// BrandingView controls optional logo, accent color, font and line-item columns on PDF/HTML templates.
 type BrandingView struct {
 	LogoURL       string
 	AccentColor   string
+	FontFamily    string
 	ShowQuantity  bool
 	ShowUnitPrice bool
 	ShowTax       bool
@@ -13,6 +14,7 @@ type BrandingView struct {
 	LabelUnitPrice   string
 	LabelTax         string
 	LabelLineTotal   string
+	ExtraColumnLabels []string // user-defined extra column headers
 }
 
 // DefaultBrandingView shows all standard line columns and no logo override.

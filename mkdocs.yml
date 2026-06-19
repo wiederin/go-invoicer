@@ -17,9 +17,25 @@ nav:
   - Home: index.md
   - Getting started: getting-started.md
   - Hosted platform & plans: hosted-platform.md
+  - Hosted vs OSS: hosted-vs-oss.md
+  - API reference: api-reference.md
+  - Paid features guide: paid-features.md
+  - Invoice customization: invoice-customization.md
+  - Document types: document-types.md
+  - Email delivery: email-delivery.md
+  - Buyer portal: buyer-portal.md
+  - Settlement reports: settlement-reports.md
+  - Templates & branding: template-branding.md
+  - Outbound webhooks: outbound-webhooks.md
+  - Self-hosted deployment: self-hosted.md
+  - Stripe integration: stripe-integration.md
+  - Replace Stripe Invoicing: replace-stripe-invoicing.md
+  - Accounting overview: accounting-integrations.md
+  - Xero integration: xero-integration.md
+  - QuickBooks integration: quickbooks-integration.md
   - Templates: templates.md
   - Swiss QR-bill: swiss-qr.md
-  - Stripe: stripe.md
+  - Stripe (OSS library): stripe.md
   - Examples: examples.md
   - Changelog: changelog.md
 

@@ -4,6 +4,8 @@ The **open-source library** (`github.com/wiederin/go-invoicer`) is free under Ap
 
 This page describes what each subscription tier unlocks, how gates work in the API, and what remains free on every plan.
 
+**Integration guides:** [Paid features](paid-features.md) · [Stripe](stripe-integration.md) · [Replace Stripe Invoicing](replace-stripe-invoicing.md) · [Xero](xero-integration.md) · [QuickBooks](quickbooks-integration.md)
+
 ## Plans (CHF / month)
 
 | Plan | Price | Invoices / month | Overage |
@@ -51,6 +53,7 @@ Feature slugs are stored on `billing_plans.features` and returned in `subscripti
     These capabilities are **not** paywalled:
 
     - **Line item columns** — show/hide quantity, unit price, tax, line total; optional custom column headers (`PATCH /v1/org/rendering` → `line_columns`).
+    - **Default invoice notes** — footer text applied when `invoice.notes` is empty on create/generate (`default_notes` on rendering profile).
     - **Invoice numbering** — prefix, pattern, auto-assign on create (`GET /v1/invoices/next-number`).
     - **Scheduled invoices** — cron schedules (`/v1/invoice-schedules`, Settings → Scheduled invoices). Disable the worker with `INVOICE_SCHEDULER_ENABLED=false` on the API.
     - **Inbound hook** — per-org secret URL (`POST /v1/hooks/{token}/invoices`) for ERP/Zapier without an API key; rotate in Settings → Automation.
@@ -65,7 +68,9 @@ Feature slugs are stored on `billing_plans.features` and returned in `subscripti
 - `POST /v1/integrations/stripe/import` — import by Stripe invoice id.
 - `POST /v1/invoices/:id/sync/stripe` — export local invoice to Stripe.
 - `POST /v1/invoices/:id/stripe/bill` — finalize & send (when **Replace Stripe Invoicing** mode is `finalize_send`).
-- Webhook: `POST /v1/webhooks/stripe/:org_id`.
+- Webhook: `POST /v1/webhooks/stripe/:org_id` — `invoice.paid` sets local status to **`paid`**.
+
+**Guides:** [Stripe integration](stripe-integration.md) (setup & API) · [Replace Stripe Invoicing](replace-stripe-invoicing.md) (payments-only Stripe + tracking).
 
 Integration buttons on the invoice list appear when the integration is **configured** (`GET /v1/integrations` → `status: ready`) **and** your plan includes the matching feature slug. The API still returns **402** if either check fails.
 
@@ -74,6 +79,8 @@ Integration buttons on the invoice list appear when the integration is **configu
 - OAuth connect from Settings (`GET /v1/oauth/xero/connect`, QuickBooks equivalent).
 - Import by external id; export from invoice row actions.
 - PDF render is queued automatically using org template defaults.
+
+See [Xero integration](xero-integration.md) and [QuickBooks integration](quickbooks-integration.md).
 
 ### Compliance ZIP (`compliance`) — Pro+
 
@@ -154,4 +161,4 @@ export INVOICE_SCHEDULER_ENABLED=false
 | Multi-tenant orgs & API keys | | ✓ |
 | Xero / QBO / compliance / e-invoice | Enterprise modules in monorepo | ✓ (plan-gated) |
 
-For library-only usage, see [Getting started](getting-started.md) and [Stripe](stripe.md).
+For library-only usage, see [Getting started](getting-started.md) and [Stripe (OSS)](stripe.md). For all paid integrations, start with [Paid features guide](paid-features.md).

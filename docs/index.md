@@ -15,7 +15,16 @@ go get github.com/wiederin/go-invoicer@latest
 
 See [Getting started](getting-started.md).
 
-Using the **hosted dashboard and API**? See [Hosted platform — plans & paid features](hosted-platform.md) for subscription tiers, feature gates, and what is included on every plan.
+Using the **hosted dashboard and API**?
+
+**On the website:** [invoicer.survih.ch/docs](https://invoicer.survih.ch/docs) — full guides (Stripe, Xero, QuickBooks, paid features) without leaving the dashboard.
+
+**In this repo (MkDocs / GitHub):**
+
+- [Hosted platform — plans & paid features](hosted-platform.md) — tiers, feature matrix, gates
+- [Paid features guide](paid-features.md) — how to use each integration from the API
+- [Stripe integration](stripe-integration.md) · [Replace Stripe Invoicing](replace-stripe-invoicing.md)
+- [Xero](xero-integration.md) · [QuickBooks](quickbooks-integration.md) · [Accounting overview](accounting-integrations.md)
 
 ## Build docs locally
 

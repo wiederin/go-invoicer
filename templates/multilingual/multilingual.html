@@ -4,6 +4,9 @@
   <meta charset="utf-8">
   <title>{{.Labels.Invoice}} {{.Number}}</title>
   <style>
+    :root { --accent: #2563eb; }
+    {{template "branding-accent-css" .}}
+    p, td, th, h1, h2, h3 { word-break: break-word; overflow-wrap: break-word; hyphens: auto; }
     body { font-family: system-ui, sans-serif; margin: 40px; color: #1a1a1a; display: flex; flex-direction: column; }
     .gi-block { display: block; }
     h1 { font-size: 24px; margin-bottom: 4px; }
@@ -16,42 +19,40 @@
     .grand td { font-weight: bold; border-top: 2px solid #111; }
     .logo { max-height: 48px; max-width: 200px; margin-bottom: 8px; display: block; }
     {{if and .Branding .Branding.AccentColor}}.grand td { border-top-color: {{.Branding.AccentColor}}; }{{end}}
+    {{if and .Branding .Branding.FontFamily}}body { font-family: {{.Branding.FontFamily}}; }{{end}}
+    @page { margin-bottom: 36mm; @bottom-center { content: "Page " counter(page) " of " counter(pages); font-size: 9px; color: #999; font-family: system-ui, sans-serif; } }
   </style>
 </head>
 <body>
   {{if (.Layout.Show "header")}}
   <div class="gi-block" data-block-id="header" style="order: {{.Layout.Ord "header"}}">
     {{if and .Branding .Branding.LogoURL}}<img class="logo" src="{{.Branding.LogoURL}}" alt="">{{end}}
-    <h1>{{.Labels.Invoice}} {{.Number}}</h1>
-    <p class="meta">{{.Labels.Issued}}: {{.IssuedAt}}{{if .DueAt}} · {{.Labels.Due}}: {{.DueAt}}{{end}}</p>
+    <h1>{{.Labels.Invoice}}</h1>
+    <p class="meta" style="font-weight:600;font-size:15px;color:#333;margin-bottom:4px">#{{.Number}}</p>
+    <p class="meta">{{.Labels.Issued}}: {{.IssuedAt}}{{if .DueAt}} · {{.Labels.Due}}: {{.DueAt}}{{end}}{{range .CustomFields}} · <strong>{{.Key}}:</strong> {{.Value}}{{end}}</p>
   </div>
   {{end}}
   {{if (.Layout.Show "parties")}}
   <div class="gi-block" data-block-id="parties" style="order: {{.Layout.Ord "parties"}}">
-    <p><strong>{{.Labels.From}}:</strong> {{.Seller.Name}}<br>{{.Seller.Address}}</p>
-    <p><strong>{{.Labels.BillTo}}:</strong> {{.Buyer.Name}}<br>{{.Buyer.Address}}</p>
+    <p><strong>{{.Labels.From}}:</strong> {{.Seller.Name}}<br>{{if .Seller.Email}}{{.Seller.Email}}<br>{{end}}{{if .Seller.Phone}}{{.Seller.Phone}}<br>{{end}}{{.Seller.Address}}{{if .TaxID}}<br><span style="font-size:11px;color:#888">Tax ID: {{.TaxID}}</span>{{end}}</p>
+    <p><strong>{{.Labels.BillTo}}:</strong> {{.Buyer.Name}}<br>{{if .Buyer.Department}}<em>{{.Buyer.Department}}</em><br>{{end}}{{if .Buyer.Email}}{{.Buyer.Email}}<br>{{end}}{{.Buyer.Address}}</p>
   </div>
   {{end}}
   {{if (.Layout.Show "line_items")}}
   <div class="gi-block" data-block-id="line_items" style="order: {{.Layout.Ord "line_items"}}">
   <table>
     <thead>
-      <tr>
-        <th>{{if and .Branding .Branding.LabelDescription}}{{.Branding.LabelDescription}}{{else}}{{.Labels.Description}}{{end}}</th>
-        {{if or (not .Branding) .Branding.ShowQuantity}}<th class="num">{{if and .Branding .Branding.LabelQuantity}}{{.Branding.LabelQuantity}}{{else}}{{.Labels.Quantity}}{{end}}</th>{{end}}
-        {{if or (not .Branding) .Branding.ShowUnitPrice}}<th class="num">{{if and .Branding .Branding.LabelUnitPrice}}{{.Branding.LabelUnitPrice}}{{else}}{{.Labels.UnitPrice}}{{end}}</th>{{end}}
-        {{if or (not .Branding) .Branding.ShowTax}}<th class="num">{{if and .Branding .Branding.LabelTax}}{{.Branding.LabelTax}}{{else}}{{.Labels.Tax}}{{end}}</th>{{end}}
-        {{if or (not .Branding) .Branding.ShowLineTotal}}<th class="num">{{if and .Branding .Branding.LabelLineTotal}}{{.Branding.LabelLineTotal}}{{else}}{{.Labels.Amount}}{{end}}</th>{{end}}
-      </tr>
+      <tr>{{template "line-head-en" .}}</tr>
     </thead>
     <tbody>
       {{range .Lines}}
       <tr>
-        <td>{{.Description}}</td>
+        <td>{{.Description}}{{template "line-custom-fields" .}}</td>
         {{if or (not $.Branding) $.Branding.ShowQuantity}}<td class="num">{{.Quantity}}</td>{{end}}
         {{if or (not $.Branding) $.Branding.ShowUnitPrice}}<td class="num">{{.UnitPrice}}</td>{{end}}
         {{if or (not $.Branding) $.Branding.ShowTax}}<td class="num">{{.TaxLabel}}</td>{{end}}
-        {{if or (not $.Branding) $.Branding.ShowLineTotal}}<td class="num">{{.LineTotal}}</td>{{end}}
+        {{if or (not $.Branding) $.Branding.ShowLineTotal}}<td class="num">{{template "line-total-cell" .}}</td>{{end}}
+        {{if $.Branding}}{{$line := .}}{{range $col := $.Branding.ExtraColumnLabels}}<td class="num">{{customFieldValue $line.CustomFields $col}}</td>{{end}}{{end}}
       </tr>
       {{end}}
     </tbody>
@@ -67,10 +68,18 @@
   </table>
   </div>
   {{end}}
-  {{if and (.Layout.Show "notes") .Notes}}
-  <div class="gi-block" data-block-id="notes" style="order: {{.Layout.Ord "notes"}}">
-    <p><strong>{{.Labels.Notes}}:</strong> {{.Notes}}</p>
+  {{if .PaymentInstructions}}
+  <div class="gi-block" style="order:80;margin-top:24px;padding-top:16px;border-top:1px solid #e5e5e5;font-size:13px">
+    <strong style="display:block;margin-bottom:6px;color:#333">{{.Labels.PaymentInstructions}}</strong>
+    <span style="white-space:pre-line;color:#555">{{.PaymentInstructions}}</span>
   </div>
   {{end}}
+  {{if and (.Layout.Show "notes") .Notes}}
+  <div class="gi-block" data-block-id="notes" style="order: {{.Layout.Ord "notes"}};margin-top:24px;padding-top:16px;border-top:1px solid #e5e5e5;font-size:13px">
+    <strong style="display:block;margin-bottom:6px;color:#333">{{.Labels.Notes}}</strong>
+    <span style="color:#555">{{.Notes}}</span>
+  </div>
+  {{end}}
+  {{if or .Footer .FooterKeyInfo}}<div style="order:999;padding-top:24px;border-top:1px solid #e5e5e5;font-size:11px;color:#888;text-align:center">{{if .Footer}}{{.Footer}}{{end}}{{if .FooterKeyInfo}}<div style="margin-top:4px;font-size:10px">{{.Number}} | {{.Labels.TotalDue}}: {{.Total}}{{if .DueAt}} | {{.Labels.Due}} {{.DueAt}}{{end}}</div>{{end}}</div>{{end}}
 </body>
 </html>

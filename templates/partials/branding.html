@@ -3,11 +3,15 @@
 {{end}}
 {{define "branding-accent-css"}}
 {{if and .Branding .Branding.AccentColor}}:root { --accent: {{.Branding.AccentColor}}; }{{end}}
+{{if and .Branding .Branding.FontFamily}}body { font-family: {{.Branding.FontFamily}}; }{{end}}
 {{end}}
 {{define "line-head-en"}}
-<th>{{if .Branding}}{{.Branding.LabelDescription}}{{else}}Description{{end}}</th>
-{{if or (not .Branding) .Branding.ShowQuantity}}<th class="num">{{if .Branding}}{{.Branding.LabelQuantity}}{{else}}Qty{{end}}</th>{{end}}
-{{if or (not .Branding) .Branding.ShowUnitPrice}}<th class="num">{{if .Branding}}{{.Branding.LabelUnitPrice}}{{else}}Unit{{end}}</th>{{end}}
-{{if or (not .Branding) .Branding.ShowTax}}<th class="num">{{if .Branding}}{{.Branding.LabelTax}}{{else}}Tax{{end}}</th>{{end}}
-{{if or (not .Branding) .Branding.ShowLineTotal}}<th class="num">{{if .Branding}}{{.Branding.LabelLineTotal}}{{else}}Amount{{end}}</th>{{end}}
+<th>{{if and .Branding .Branding.LabelDescription}}{{.Branding.LabelDescription}}{{else}}{{.Labels.Description}}{{end}}</th>
+{{if or (not .Branding) .Branding.ShowQuantity}}<th class="num">{{if and .Branding .Branding.LabelQuantity}}{{.Branding.LabelQuantity}}{{else}}{{.Labels.Quantity}}{{end}}</th>{{end}}
+{{if or (not .Branding) .Branding.ShowUnitPrice}}<th class="num">{{if and .Branding .Branding.LabelUnitPrice}}{{.Branding.LabelUnitPrice}}{{else}}{{.Labels.UnitPrice}}{{end}}</th>{{end}}
+{{if or (not .Branding) .Branding.ShowTax}}<th class="num">{{if and .Branding .Branding.LabelTax}}{{.Branding.LabelTax}}{{else}}{{.Labels.Tax}}{{end}}</th>{{end}}
+{{if or (not .Branding) .Branding.ShowLineTotal}}<th class="num">{{if and .Branding .Branding.LabelLineTotal}}{{.Branding.LabelLineTotal}}{{else}}{{.Labels.Amount}}{{end}}</th>{{end}}
+{{if .Branding}}{{range .Branding.ExtraColumnLabels}}<th class="num">{{.}}</th>{{end}}{{end}}
 {{end}}
+{{define "line-custom-fields"}}{{if .SupplyDateStart}}<br><span style="font-size:11px;color:#9ca3af">{{.SupplyDateStart}}{{if .SupplyDateEnd}} – {{.SupplyDateEnd}}{{end}}</span>{{end}}{{if .Discount}}<br><span style="font-size:11px;color:#ef4444;font-weight:500">Discount {{.Discount}}</span>{{end}}{{range .CustomFields}}<br><span style="font-size:11px;color:#9ca3af;font-weight:500">{{.Key}}:</span> <span style="font-size:11px;color:#6b7280">{{.Value}}</span>{{end}}{{end}}
+{{define "line-total-cell"}}{{if .OriginalLineTotal}}<span style="text-decoration:line-through;color:#9ca3af;font-size:11px;margin-right:4px">{{.OriginalLineTotal}}</span>{{end}}{{.LineTotal}}{{end}}

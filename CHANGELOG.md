@@ -2,6 +2,21 @@
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-05-26
+
+### Added
+
+- **Document kinds** on `invoice.Invoice` — `quote`, `proforma`, `credit_note`, `receipt` (`oss/invoice/document.go`)
+- Localized document titles via `render/i18n` labels (`Labels.Invoice` in templates)
+- **Branding partial** (`templates/partials/branding.html`) — logo, accent color, togglable line columns and custom column headers (`render.BrandingView`)
+- **Settlement reports** — `oss/settlement` summary model, `templates/settlement/settlement.html`, `render.RenderSettlement`
+- Examples: `quote/`, `receipt/`, `automation/` (custom columns + hooks)
+- Docs: `document-types.md`, `settlement-reports.md`, `email-delivery.md`, `buyer-portal.md`, `hosted-vs-oss.md`, `api-reference.md` (OpenAPI pointer)
+
+### Changed
+
+- Invoice HTML templates use `{{.Labels.Invoice}}` for the document title instead of a hard-coded “Invoice”
+
 ## [0.2.0] - 2026-05-24
 
 ### Added
@@ -37,5 +52,6 @@
 - Examples: `basic`, `with_template`, `swiss_qr`
 - MkDocs documentation scaffold
 
+[0.3.0]: https://github.com/wiederin/go-invoicer/releases/tag/v0.3.0
 [0.2.0]: https://github.com/wiederin/go-invoicer/releases/tag/v0.2.0
 [0.1.0]: https://github.com/wiederin/go-invoicer/releases/tag/v0.1.0

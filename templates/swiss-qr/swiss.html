@@ -15,6 +15,7 @@
     th, td { padding: 8px; border-bottom: 1px solid #ddd; text-align: left; }
     td.num { text-align: right; }
     .payable { margin-top: 16px; font-size: 12px; background: #f5f5f5; padding: 12px; }
+    p, td, th, h1, h2, h3 { word-break: break-word; overflow-wrap: break-word; hyphens: auto; }
   </style>
 </head>
 <body>
@@ -38,7 +39,7 @@
         <thead><tr><th>Beschreibung</th><th class="num">Betrag</th></tr></thead>
         <tbody>
           {{range .Lines}}
-          <tr><td>{{.Description}}</td><td class="num">{{.LineTotal}}</td></tr>
+          <tr><td>{{.Description}}{{template "line-custom-fields" .}}</td><td class="num">{{template "line-total-cell" .}}</td></tr>
           {{end}}
         </tbody>
       </table>
@@ -49,7 +50,8 @@
       {{if (.Layout.Show "payment")}}
       <p class="payable"><strong>Zahlbar:</strong> {{.Total}}<br>IBAN: {{.IBAN}}</p>
       {{end}}
-      {{if and (.Layout.Show "notes") .Notes}}<p>{{.Notes}}</p>{{end}}
+      {{if .PaymentInstructions}}<div style="margin-top:12px;padding:10px 12px;background:#f5f5f5;border-left:3px solid #111;font-size:12px"><strong style="display:block;margin-bottom:2px;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#555">Zahlungsanweisungen</strong><span style="white-space:pre-line">{{.PaymentInstructions}}</span></div>{{end}}
+      {{if and (.Layout.Show "notes") .Notes}}<div style="margin-top:12px;padding:10px 12px;background:#f5f5f5;border-left:3px solid #111;font-size:12px"><strong style="display:block;margin-bottom:2px;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#555">Anmerkungen</strong>{{.Notes}}</div>{{end}}
     </div>
     {{if (.Layout.Show "payment")}}
     <div class="qr-box" data-block-id="payment" style="order: {{.Layout.Ord "payment"}}">

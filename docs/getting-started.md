@@ -63,7 +63,12 @@ domain := apiInv.ToDomainInvoice().ToDomain(opts)
 
 ## Hosted platform
 
-The OSS library runs locally without a subscription. If you use the **hosted API and dashboard**, plans gate integrations, compliance exports, e-invoices, and logo/accent branding — while line-item columns, numbering, and cron schedules stay on every tier. See [Hosted platform — plans & paid features](hosted-platform.md).
+The OSS library runs locally without a subscription. If you use the **hosted API and dashboard**, plans gate integrations, compliance exports, e-invoices, and logo/accent branding — while line-item columns, numbering, and cron schedules stay on every tier.
+
+- [Hosted platform — plans & paid features](hosted-platform.md)
+- [Paid features guide](paid-features.md) — Stripe, Xero, QBO, compliance, automation
+- [Stripe integration](stripe-integration.md) · [Replace Stripe Invoicing](replace-stripe-invoicing.md)
+- [Xero](xero-integration.md) · [QuickBooks](quickbooks-integration.md)
 
 ## Release v0.1.0
 

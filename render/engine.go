@@ -21,7 +21,17 @@ func NewEngine(fsys fs.FS, patterns ...string) (*Engine, error) {
 	if len(patterns) == 0 {
 		patterns = []string{"default/*.html"}
 	}
-	tmpl, err := template.New("invoice").ParseFS(fsys, patterns...)
+	funcs := template.FuncMap{
+		"customFieldValue": func(fields []CustomFieldView, key string) string {
+			for _, cf := range fields {
+				if cf.Key == key {
+					return cf.Value
+				}
+			}
+			return ""
+		},
+	}
+	tmpl, err := template.New("invoice").Funcs(funcs).ParseFS(fsys, patterns...)
 	if err != nil {
 		return nil, fmt.Errorf("render: parse templates: %w", err)
 	}
@@ -34,14 +44,16 @@ func DefaultEngine() (*Engine, error) {
 		"partials/*.html",
 		"default/*.html", "minimal/*.html", "swiss-qr/*.html", "multilingual/*.html",
 		"modern/*.html", "studio/*.html",
-		"stratosphere/*.html", "ocean/*.html", "ledger/*.html", "mist/*.html")
+		"stratosphere/*.html", "ocean/*.html", "ledger/*.html", "mist/*.html",
+		"settlement/*.html")
 }
 
 // RenderOptions configures a render call.
 type RenderOptions struct {
-	Locale       i18n.Locale
-	Branding     *BrandingView
-	LayoutBlocks []string
+	Locale          i18n.Locale
+	Branding        *BrandingView
+	LayoutBlocks    []string
+	BilingualLabels bool // when true, labels show both the locale language and English (for multilingual template)
 }
 
 // RenderWithOptions renders using locale-aware view data.
@@ -53,7 +65,13 @@ func (e *Engine) RenderWithOptions(inv *invoice.Invoice, templateName string, op
 	if locale == "" {
 		locale = i18n.LocaleEN
 	}
-	data := WithLayout(WithBranding(InvoiceViewFromLocale(inv, locale), opts.Branding), opts.LayoutBlocks)
+	var view InvoiceView
+	if opts.BilingualLabels {
+		view = invoiceViewFromLocaleBilingual(inv, locale)
+	} else {
+		view = InvoiceViewFromLocale(inv, locale)
+	}
+	data := WithLayout(WithBranding(view, opts.Branding), opts.LayoutBlocks)
 	var buf bytes.Buffer
 	if err := e.templates.ExecuteTemplate(&buf, templateName, data); err != nil {
 		return "", fmt.Errorf("render: execute %s: %w", templateName, err)

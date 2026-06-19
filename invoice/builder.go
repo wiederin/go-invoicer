@@ -20,6 +20,16 @@ func (b *Builder) Number(n string) *Builder {
 	return b
 }
 
+func (b *Builder) Kind(k DocumentKind) *Builder {
+	b.inv.Kind = k
+	return b
+}
+
+func (b *Builder) RelatedNumber(n string) *Builder {
+	b.inv.RelatedNumber = n
+	return b
+}
+
 func (b *Builder) IssuedAt(t time.Time) *Builder {
 	b.inv.IssuedAt = t.UTC()
 	return b

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Invoice {{.Number}}</title>
+  <title>{{.Labels.Invoice}} {{.Number}}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -17,6 +17,7 @@
       --muted: #4a7a9b;
       --line: rgba(56, 168, 255, 0.2);
       --radius: 14px;
+      --accent: #38a8ff;
     }
     {{template "branding-accent-css" .}}
     * { box-sizing: border-box; }
@@ -40,7 +41,6 @@
       box-shadow: 0 12px 32px rgba(56, 168, 255, 0.08);
     }
     .sky-bar { height: 4px; background: linear-gradient(90deg, var(--sky), var(--ocean)); }
-    .inner { padding: 40px 44px 44px; display: flex; flex-direction: column; }
     .gi-block { display: block; }
     .head { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; margin-bottom: 32px; }
     .eyebrow { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--sky); margin-bottom: 6px; }
@@ -64,9 +64,11 @@
     table.totals td { padding: 6px 0; color: var(--muted); }
     table.totals td:last-child { text-align: right; font-variant-numeric: tabular-nums; color: var(--void); }
     table.totals tr.grand td { padding-top: 12px; border-top: 2px solid var(--sky); font-size: 17px; font-weight: 700; color: var(--void); }
-    .notes { margin-top: 28px; padding: 16px 18px; border-radius: 8px; border: 1px dashed var(--line); background: var(--cloud); }
-    .notes h2 { margin: 0 0 6px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+    .notes { margin-top: 28px; padding: 16px 18px; border-radius: 0 8px 8px 0; border-left: 4px solid var(--accent); background: var(--cloud); }
+    .notes h2 { margin: 0 0 6px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); }
     .notes p { margin: 0; color: var(--muted); }
+    p, td, th, h1, h2, h3 { word-break: break-word; overflow-wrap: break-word; hyphens: auto; }
+    @page { margin-bottom: 36mm; @bottom-center { content: "Page " counter(page) " of " counter(pages); font-size: 9px; color: #999; font-family: system-ui, sans-serif; } }
   </style>
 </head>
 <body>
@@ -76,41 +78,43 @@
       {{if (.Layout.Show "header")}}
       <div class="gi-block head" data-block-id="header" style="order: {{.Layout.Ord "header"}}">
         <div>
-          <div class="eyebrow">Invoice from</div>
+          <div class="eyebrow">{{.Labels.Invoice}} {{.Labels.From}}</div>
           <h1 class="seller-name">{{.Seller.Name}}</h1>
         </div>
         <div class="badge">
-          <div class="label">Invoice</div>
+          <div class="label">{{.Labels.Invoice}}</div>
           <div class="number">{{.Number}}</div>
-          <div class="dates">Issued {{.IssuedAt}}{{if .DueAt}}<br>Due {{.DueAt}}{{end}}</div>
+          <div class="dates">{{.Labels.Issued}} {{.IssuedAt}}{{if .DueAt}}<br>{{.Labels.Due}} {{.DueAt}}{{end}}{{range .CustomFields}}<br><strong>{{.Key}}:</strong> {{.Value}}{{end}}</div>
         </div>
       </div>
       {{end}}
       {{if (.Layout.Show "parties")}}
       <div class="gi-block parties" data-block-id="parties" style="order: {{.Layout.Ord "parties"}}">
-        <div class="party"><h2>From</h2><strong>{{.Seller.Name}}</strong><br>{{if .Seller.Email}}{{.Seller.Email}}<br>{{end}}{{if .Seller.VATID}}VAT {{.Seller.VATID}}<br>{{end}}{{.Seller.Address}}</div>
-        <div class="party"><h2>Bill to</h2><strong>{{.Buyer.Name}}</strong><br>{{if .Buyer.Email}}{{.Buyer.Email}}<br>{{end}}{{if .Buyer.VATID}}VAT {{.Buyer.VATID}}<br>{{end}}{{.Buyer.Address}}</div>
+        <div class="party"><h2>{{.Labels.From}}</h2><strong>{{.Seller.Name}}</strong><br>{{if .Seller.Email}}{{.Seller.Email}}<br>{{end}}{{if .Seller.Phone}}{{.Seller.Phone}}<br>{{end}}{{if .Seller.VATID}}VAT {{.Seller.VATID}}<br>{{end}}{{.Seller.Address}}{{if .TaxID}}<br><span style="font-size:11px;color:var(--muted)">Tax ID: {{.TaxID}}</span>{{end}}</div>
+        <div class="party"><h2>{{.Labels.BillTo}}</h2><strong>{{.Buyer.Name}}</strong><br>{{if .Buyer.Department}}<em style="color:var(--muted)">{{.Buyer.Department}}</em><br>{{end}}{{if .Buyer.Email}}{{.Buyer.Email}}<br>{{end}}{{if .Buyer.VATID}}VAT {{.Buyer.VATID}}<br>{{end}}{{.Buyer.Address}}</div>
       </div>
       {{end}}
       {{if (.Layout.Show "line_items")}}
       <div class="gi-block" data-block-id="line_items" style="order: {{.Layout.Ord "line_items"}}">
       <table class="items">
         <thead><tr>{{template "line-head-en" .}}</tr></thead>
-        <tbody>{{range .Lines}}<tr><td>{{.Description}}</td>{{if or (not $.Branding) $.Branding.ShowQuantity}}<td class="num">{{.Quantity}}</td>{{end}}{{if or (not $.Branding) $.Branding.ShowUnitPrice}}<td class="num">{{.UnitPrice}}</td>{{end}}{{if or (not $.Branding) $.Branding.ShowTax}}<td class="num">{{.TaxLabel}}</td>{{end}}{{if or (not $.Branding) $.Branding.ShowLineTotal}}<td class="num">{{.LineTotal}}</td>{{end}}</tr>{{end}}</tbody>
+        <tbody>{{range .Lines}}<tr><td>{{.Description}}{{template "line-custom-fields" .}}</td>{{if or (not $.Branding) $.Branding.ShowQuantity}}<td class="num">{{.Quantity}}</td>{{end}}{{if or (not $.Branding) $.Branding.ShowUnitPrice}}<td class="num">{{.UnitPrice}}</td>{{end}}{{if or (not $.Branding) $.Branding.ShowTax}}<td class="num">{{.TaxLabel}}</td>{{end}}{{if or (not $.Branding) $.Branding.ShowLineTotal}}<td class="num">{{template "line-total-cell" .}}</td>{{end}}{{if $.Branding}}{{$line := .}}{{range $col := $.Branding.ExtraColumnLabels}}<td class="num">{{customFieldValue $line.CustomFields $col}}</td>{{end}}{{end}}</tr>{{end}}</tbody>
       </table>
       </div>
       {{end}}
       {{if (.Layout.Show "totals")}}
       <div class="gi-block footer" data-block-id="totals" style="order: {{.Layout.Ord "totals"}}">
         <table class="totals">
-          <tr><td>Subtotal</td><td>{{.Subtotal}}</td></tr>
+          <tr><td>{{.Labels.Subtotal}}</td><td>{{.Subtotal}}</td></tr>
           {{range .TaxLines}}<tr><td>{{.Label}}</td><td>{{.Amount}}</td></tr>{{end}}
-          <tr class="grand"><td>Total due</td><td>{{.Total}}</td></tr>
+          <tr class="grand"><td>{{.Labels.TotalDue}}</td><td>{{.Total}}</td></tr>
         </table>
       </div>
       {{end}}
-      {{if and (.Layout.Show "notes") .Notes}}<div class="gi-block notes" data-block-id="notes" style="order: {{.Layout.Ord "notes"}}"><h2>Notes</h2><p>{{.Notes}}</p></div>{{end}}
+      {{if .PaymentInstructions}}<div class="gi-block notes" style="order:80"><h2>Payment instructions</h2><p style="white-space:pre-line">{{.PaymentInstructions}}</p></div>{{end}}
+      {{if and (.Layout.Show "notes") .Notes}}<div class="gi-block notes" data-block-id="notes" style="order: {{.Layout.Ord "notes"}}"><h2>{{.Labels.Notes}}</h2><p>{{.Notes}}</p></div>{{end}}
     </div>
   </div>
+  {{if or .Footer .FooterKeyInfo}}<div style="margin-top:24px;padding:12px 44px;border-top:1px solid rgba(255,255,255,0.2);font-size:11px;color:var(--muted);text-align:center">{{if .Footer}}{{.Footer}}{{end}}{{if .FooterKeyInfo}}<div style="margin-top:4px;font-size:10px">{{.Number}} | {{.Labels.TotalDue}}: {{.Total}}{{if .DueAt}} | {{.Labels.Due}} {{.DueAt}}{{end}}</div>{{end}}</div>{{end}}
 </body>
 </html>

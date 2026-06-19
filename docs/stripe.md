@@ -1,6 +1,10 @@
-# Stripe integration
+# Stripe (OSS library)
 
-Import Stripe invoices into the go-invoicer domain model and handle webhooks.
+Apache 2.0 package: `github.com/wiederin/go-invoicer/integrations/stripe`
+
+Use this in your own Go services. The **hosted platform** adds multi-tenant credentials, PDF upload, and plan gates — see [Stripe integration](stripe-integration.md).
+
+---
 
 ## Domain mapper
 
@@ -15,11 +19,16 @@ if err := inv.Validate(); err != nil { ... }
 ```go
 client := stripe.NewClient(os.Getenv("STRIPE_SECRET_KEY"))
 inv, err := client.SyncInvoice(ctx, "in_123", stripe.ImportOptions{Supplier: supplier})
+
+// Export
+stripeID, err := client.PushInvoice(ctx, domainInv, stripe.ExportOptions{Supplier: supplier})
+err = client.UploadPDF(ctx, "invoice.pdf", pdfBytes)
+err = client.LinkBrandedPDF(ctx, stripeID, pdfURL, jobID, fileID)
+err = client.FinalizeInvoice(ctx, stripeID)
+err = client.SendInvoice(ctx, stripeID)
 ```
 
 ## Webhooks
-
-The OSS package provides an `http.Handler` with optional signature verification:
 
 ```go
 http.Handle("/webhooks/stripe", stripe.WebhookHandler(stripe.HandlerOptions{
@@ -32,17 +41,27 @@ http.Handle("/webhooks/stripe", stripe.WebhookHandler(stripe.HandlerOptions{
 }))
 ```
 
-Supported events: `invoice.finalized`, `invoice.paid`.
+**Supported events:** `invoice.finalized`, `invoice.paid`
 
-### Platform API
+### Hosted platform endpoint
 
-Hosted endpoint (no platform API key; Stripe signs requests):
+Per-organization URL (Stripe signs with the org's `whsec_…`):
 
-`POST /v1/webhooks/stripe`
+```text
+POST /v1/webhooks/stripe/:org_id
+```
+
+Platform sets local invoice `status` to `paid` on `invoice.paid`. See [Replace Stripe Invoicing](replace-stripe-invoicing.md).
 
 ## Example
 
 ```bash
-export STRIPE_SECRET_KEY=sk_test_...
+export STRIPE_SECRET_KEY=sk_test_…
 go run ./examples/stripe_sync -invoice in_xxx
 ```
+
+## Hosted guides
+
+- [Stripe integration](stripe-integration.md) — connect, import, export, automation
+- [Replace Stripe Invoicing](replace-stripe-invoicing.md) — payments-only Stripe + tracking
+- [Paid features](paid-features.md) — plan requirements

@@ -26,6 +26,22 @@ func sampleInvoice(t *testing.T) *invoice.Invoice {
 	return inv
 }
 
+func TestRenderQuoteTitle(t *testing.T) {
+	inv := sampleInvoice(t)
+	inv.Kind = invoice.DocumentQuote
+	engine, err := render.DefaultEngine()
+	if err != nil {
+		t.Fatal(err)
+	}
+	html, err := engine.RenderMinimal(inv)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(html, "Quote") || strings.Contains(html, ">Invoice<") {
+		t.Fatalf("expected quote title in HTML, got fragment: %.120s", html)
+	}
+}
+
 func TestRenderMinimal(t *testing.T) {
 	engine, err := render.DefaultEngine()
 	if err != nil {
@@ -85,7 +101,7 @@ func TestRenderBrandingPackTemplates(t *testing.T) {
 	}{
 		{"stratosphere", engine.RenderStratosphere, []string{"INV-TPL-1", "sky-bar", "Total due"}},
 		{"ocean", engine.RenderOcean, []string{"INV-TPL-1", "hero gi-block", "Total due"}},
-		{"ledger", engine.RenderLedger, []string{"INV-TPL-1", "Tax invoice", "Space Mono"}},
+		{"ledger", engine.RenderLedger, []string{"INV-TPL-1", "Invoice", "Space Mono"}},
 		{"mist", engine.RenderMist, []string{"INV-TPL-1", "class=\"sheet\"", "Total due"}},
 	}
 	for _, tc := range cases {

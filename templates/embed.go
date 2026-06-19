@@ -5,7 +5,7 @@ import "embed"
 
 // FS contains all embedded HTML templates.
 //
-//go:embed partials/*.html default/*.html minimal/*.html swiss-qr/*.html multilingual/*.html modern/*.html studio/*.html stratosphere/*.html ocean/*.html ledger/*.html mist/*.html
+//go:embed partials/*.html default/*.html minimal/*.html swiss-qr/*.html multilingual/*.html modern/*.html studio/*.html stratosphere/*.html ocean/*.html ledger/*.html mist/*.html settlement/*.html
 var FS embed.FS
 
 // Template file names (ParseFS uses the file basename as template name).
@@ -20,4 +20,5 @@ const (
 	OceanInvoice        = "ocean.html"
 	LedgerInvoice       = "ledger.html"
 	MistInvoice         = "mist.html"
+	SettlementReport    = "settlement.html"
 )
